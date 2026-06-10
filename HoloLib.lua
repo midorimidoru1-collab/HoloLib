@@ -699,6 +699,153 @@ function HoloLib:CreateWindow(titleText)
 		end
 
 		-- --------------------------------------------------------
+		--  Tab:AddDropdown(titleText, options, callback)
+		-- --------------------------------------------------------
+		function Tab:AddDropdown(titleText, options, callback)
+
+			local Selected = nil
+			local Open     = false
+
+			-- 外枠（ClipsDescendants=false でリストが外にはみ出せる）
+			local Container = Instance.new("Frame")
+			Container.Size = UDim2.new(1, 0, 0, 36)
+			Container.BackgroundTransparency = 1
+			Container.BorderSizePixel = 0
+			Container.ClipsDescendants = false
+			Container.LayoutOrder = NextOrder()
+			Container.ZIndex = 20
+			Container.Parent = tabEntry.Page
+
+			-- メインボタン（半透明バック）
+			local MainButton = Instance.new("TextButton")
+			MainButton.Size = UDim2.new(1, 0, 0, 36)
+			MainButton.BackgroundColor3 = C_BG
+			MainButton.BackgroundTransparency = 0.45
+			MainButton.BorderSizePixel = 0
+			MainButton.Text = ""
+			MainButton.ZIndex = 20
+			MainButton.Parent = Container
+
+			local MBCorner = Instance.new("UICorner")
+			MBCorner.CornerRadius = UDim.new(0, 4)
+			MBCorner.Parent = MainButton
+
+			local MBStroke = Instance.new("UIStroke")
+			MBStroke.Color = C_CYAN
+			MBStroke.Thickness = 1
+			MBStroke.Transparency = 0.5
+			MBStroke.Parent = MainButton
+
+			local Header = Instance.new("TextLabel")
+			Header.Size = UDim2.new(1, -10, 1, 0)
+			Header.Position = UDim2.fromOffset(10, 0)
+			Header.BackgroundTransparency = 1
+			Header.Font = Enum.Font.Code
+			Header.TextSize = 16
+			Header.TextColor3 = C_CYAN_LIGHT
+			Header.TextXAlignment = Enum.TextXAlignment.Left
+			Header.Text = titleText .. "  ▼"
+			Header.ZIndex = 21
+			Header.Parent = MainButton
+
+			-- リストフレーム（展開時に下へ伸びる）
+			local ListFrame = Instance.new("Frame")
+			ListFrame.Size = UDim2.new(1, 0, 0, 0)
+			ListFrame.Position = UDim2.new(0, 0, 1, 2)
+			ListFrame.BackgroundColor3 = C_BG
+			ListFrame.BackgroundTransparency = 0.3
+			ListFrame.BorderSizePixel = 0
+			ListFrame.ClipsDescendants = true
+			ListFrame.ZIndex = 22
+			ListFrame.Parent = Container
+
+			local LFCorner = Instance.new("UICorner")
+			LFCorner.CornerRadius = UDim.new(0, 4)
+			LFCorner.Parent = ListFrame
+
+			local LFStroke = Instance.new("UIStroke")
+			LFStroke.Color = C_CYAN
+			LFStroke.Thickness = 1
+			LFStroke.Transparency = 0.5
+			LFStroke.Parent = ListFrame
+
+			local Layout = Instance.new("UIListLayout")
+			Layout.SortOrder = Enum.SortOrder.LayoutOrder
+			Layout.Parent = ListFrame
+
+			local function UpdateHeader()
+				Header.Text = (Selected and tostring(Selected) or titleText) .. "  ▼"
+				Header.TextColor3 = Selected and C_CYAN or C_CYAN_LIGHT
+				MBStroke.Color = Selected and C_CYAN or C_CYAN
+			end
+
+			local function RefreshList()
+				TweenService:Create(
+					ListFrame,
+					TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+					{ Size = UDim2.new(1, 0, 0, Open and #options * 28 or 0) }
+				):Play()
+			end
+
+			local function BuildOptions()
+				for _, child in ipairs(ListFrame:GetChildren()) do
+					if child:IsA("TextButton") then child:Destroy() end
+				end
+				for i, optName in ipairs(options) do
+					local Opt = Instance.new("TextButton")
+					Opt.Size = UDim2.new(1, 0, 0, 28)
+					Opt.BackgroundTransparency = 1
+					Opt.BorderSizePixel = 0
+					Opt.Font = Enum.Font.Code
+					Opt.TextSize = 15
+					Opt.TextColor3 = C_CYAN_LIGHT
+					Opt.TextXAlignment = Enum.TextXAlignment.Left
+					Opt.Text = "  " .. tostring(optName)
+					Opt.LayoutOrder = i
+					Opt.ZIndex = 23
+					Opt.Parent = ListFrame
+
+					-- ホバー時に薄く光る
+					Opt.MouseEnter:Connect(function()
+						Opt.TextColor3 = C_CYAN
+					end)
+					Opt.MouseLeave:Connect(function()
+						Opt.TextColor3 = C_CYAN_LIGHT
+					end)
+
+					Opt.MouseButton1Click:Connect(function()
+						Selected = optName
+						UpdateHeader()
+						Open = false
+						RefreshList()
+						if callback then callback(optName) end
+					end)
+				end
+			end
+
+			MainButton.MouseButton1Click:Connect(function()
+				Open = not Open
+				RefreshList()
+			end)
+
+			BuildOptions()
+			UpdateHeader()
+
+			local obj = {}
+			function obj:Set(v)
+				Selected = v
+				UpdateHeader()
+				if callback then callback(v) end
+			end
+			function obj:Get() return Selected end
+			function obj:Refresh(newOptions)
+				options = newOptions
+				BuildOptions()
+			end
+			return obj
+		end
+
+		-- --------------------------------------------------------
 		--  Tab:AddLabel(text)
 		-- --------------------------------------------------------
 		function Tab:AddLabel(text)

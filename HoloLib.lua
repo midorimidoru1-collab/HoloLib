@@ -3,18 +3,30 @@
 --  loadstring 対応ライブラリ
 -- ============================================================
 
-local Players        = game:GetService("Players")
-local TweenService   = game:GetService("TweenService")
+local Players          = game:GetService("Players")
+local TweenService     = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RunService     = game:GetService("RunService")
+local RunService       = game:GetService("RunService")
 
-local LP         = Players.LocalPlayer
-local PlayerGui  = LP:WaitForChild("PlayerGui")
+local LP        = Players.LocalPlayer
+local PlayerGui = LP:WaitForChild("PlayerGui")
+
+-- ============================================================
+--  共通カラー定数
+-- ============================================================
+local C_CYAN       = Color3.fromRGB(0,   255, 255)
+local C_CYAN_MID   = Color3.fromRGB(150, 255, 255)
+local C_CYAN_LIGHT = Color3.fromRGB(180, 255, 255)
+local C_CYAN_TEXT  = Color3.fromRGB(200, 255, 255)
+local C_DARK       = Color3.fromRGB(80,  120, 120)
+-- 半透明バック用：暗い青黒
+local C_BG         = Color3.fromRGB(4,   18,  22)
 
 -- ============================================================
 --  内部ユーティリティ
 -- ============================================================
 
+-- コーナー装飾
 local function MakeCorner(parent, xScale, yScale)
 	local H = Instance.new("Frame")
 	H.BorderSizePixel = 0
@@ -23,7 +35,7 @@ local function MakeCorner(parent, xScale, yScale)
 		xScale, xScale == 1 and -35 or 0,
 		yScale, yScale == 1 and -3  or 0
 	)
-	H.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	H.BackgroundColor3 = C_CYAN
 	H.Parent = parent
 
 	local V = Instance.new("Frame")
@@ -33,8 +45,35 @@ local function MakeCorner(parent, xScale, yScale)
 		xScale, xScale == 1 and -3  or 0,
 		yScale, yScale == 1 and -35 or 0
 	)
-	V.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	V.BackgroundColor3 = C_CYAN
 	V.Parent = parent
+end
+
+-- 半透明バック＋細枠を持つ汎用コンテナを生成する
+-- parent    : 親インスタンス
+-- size      : UDim2
+-- layoutOrder : number
+-- returns   : Frame (内側に子を追加する対象)
+local function MakeBgFrame(parent, size, layoutOrder)
+	local Bg = Instance.new("Frame")
+	Bg.Size = size
+	Bg.BackgroundColor3 = C_BG
+	Bg.BackgroundTransparency = 0.45
+	Bg.BorderSizePixel = 0
+	Bg.LayoutOrder = layoutOrder
+	Bg.Parent = parent
+
+	local Stroke = Instance.new("UIStroke")
+	Stroke.Color = C_CYAN
+	Stroke.Thickness = 1
+	Stroke.Transparency = 0.7
+	Stroke.Parent = Bg
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 4)
+	Corner.Parent = Bg
+
+	return Bg
 end
 
 -- ============================================================
@@ -46,30 +85,27 @@ HoloLib.__index = HoloLib
 
 -- ------------------------------------------------------------
 --  CreateWindow(titleText)
---    ウィンドウ・ヘッダー・スキャンアニメ・ドラッグを生成する
 -- ------------------------------------------------------------
 function HoloLib:CreateWindow(titleText)
 
-	-- ScreenGui
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "HologramGUI"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.Parent = PlayerGui
 
-	-- Main フレーム
 	local Main = Instance.new("Frame")
 	Main.Size = UDim2.fromOffset(600, 380)
 	Main.Position = UDim2.fromScale(0.5, 0.5)
 	Main.AnchorPoint = Vector2.new(0.5, 0.5)
-	Main.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	Main.BackgroundColor3 = C_CYAN
 	Main.BackgroundTransparency = 0.93
 	Main.BorderSizePixel = 0
 	Main.ClipsDescendants = true
 	Main.Parent = ScreenGui
 
 	local Stroke = Instance.new("UIStroke")
-	Stroke.Color = Color3.fromRGB(0, 255, 255)
+	Stroke.Color = C_CYAN
 	Stroke.Thickness = 2
 	Stroke.Parent = Main
 
@@ -81,7 +117,7 @@ function HoloLib:CreateWindow(titleText)
 	Inner.Parent = Main
 
 	local InnerStroke = Instance.new("UIStroke")
-	InnerStroke.Color = Color3.fromRGB(150, 255, 255)
+	InnerStroke.Color = C_CYAN_MID
 	InnerStroke.Thickness = 1
 	InnerStroke.Parent = Inner
 
@@ -102,7 +138,7 @@ function HoloLib:CreateWindow(titleText)
 		Scan.BorderSizePixel = 0
 		Scan.Size = UDim2.new(1, 0, 0, 1)
 		Scan.Position = UDim2.new(0, 0, 0, i * 5)
-		Scan.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		Scan.BackgroundColor3 = C_CYAN
 		Scan.BackgroundTransparency = 0.97
 		Scan.Parent = ScanLayer
 	end
@@ -110,7 +146,7 @@ function HoloLib:CreateWindow(titleText)
 	local Sweep = Instance.new("Frame")
 	Sweep.BorderSizePixel = 0
 	Sweep.Size = UDim2.new(1, 0, 0, 40)
-	Sweep.BackgroundColor3 = Color3.fromRGB(180, 255, 255)
+	Sweep.BackgroundColor3 = C_CYAN_LIGHT
 	Sweep.BackgroundTransparency = 0.95
 	Sweep.Parent = ScanLayer
 
@@ -142,7 +178,7 @@ function HoloLib:CreateWindow(titleText)
 			Line.BorderSizePixel = 0
 			Line.Size = UDim2.fromOffset(Len, 2)
 			Line.Position = UDim2.new(0, -Len, 0, math.random(60, 360))
-			Line.BackgroundColor3 = Color3.fromRGB(150, 255, 255)
+			Line.BackgroundColor3 = C_CYAN_MID
 			Line.Parent = DataLayer
 
 			local G = Instance.new("UIGradient")
@@ -173,7 +209,7 @@ function HoloLib:CreateWindow(titleText)
 	TitleLabel.Text = ""
 	TitleLabel.Font = Enum.Font.Code
 	TitleLabel.TextSize = 28
-	TitleLabel.TextColor3 = Color3.fromRGB(200, 255, 255)
+	TitleLabel.TextColor3 = C_CYAN_TEXT
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Main
@@ -185,7 +221,7 @@ function HoloLib:CreateWindow(titleText)
 	Cursor.Text = "_"
 	Cursor.Font = Enum.Font.Code
 	Cursor.TextSize = 28
-	Cursor.TextColor3 = Color3.fromRGB(200, 255, 255)
+	Cursor.TextColor3 = C_CYAN_TEXT
 	Cursor.ZIndex = 10
 	Cursor.Parent = Main
 
@@ -197,7 +233,7 @@ function HoloLib:CreateWindow(titleText)
 	Minimize.Text = "-"
 	Minimize.Font = Enum.Font.Code
 	Minimize.TextSize = 24
-	Minimize.TextColor3 = Color3.fromRGB(180, 255, 255)
+	Minimize.TextColor3 = C_CYAN_LIGHT
 	Minimize.ZIndex = 10
 	Minimize.Parent = Main
 
@@ -219,7 +255,7 @@ function HoloLib:CreateWindow(titleText)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Size = UDim2.new(1, -20, 0, 2)
 	HeaderLine.Position = UDim2.new(0, 10, 0, 50)
-	HeaderLine.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+	HeaderLine.BackgroundColor3 = C_CYAN
 	HeaderLine.Parent = Main
 
 	local HeaderGradient = Instance.new("UIGradient")
@@ -237,7 +273,7 @@ function HoloLib:CreateWindow(titleText)
 	CenterMark.Size = UDim2.fromOffset(60, 4)
 	CenterMark.AnchorPoint = Vector2.new(0.5, 0)
 	CenterMark.Position = UDim2.new(0.5, 0, 0, 49)
-	CenterMark.BackgroundColor3 = Color3.fromRGB(180, 255, 255)
+	CenterMark.BackgroundColor3 = C_CYAN_LIGHT
 	CenterMark.ZIndex = 11
 	CenterMark.Parent = Main
 
@@ -250,7 +286,7 @@ function HoloLib:CreateWindow(titleText)
 	}
 	MarkGradient.Parent = CenterMark
 
-	-- タブバー（ヘッダー直下）
+	-- タブバー
 	local TabBar = Instance.new("Frame")
 	TabBar.Name = "TabBar"
 	TabBar.Size = UDim2.new(1, -20, 0, 30)
@@ -271,7 +307,7 @@ function HoloLib:CreateWindow(titleText)
 	ContentArea.ClipsDescendants = true
 	ContentArea.Parent = Main
 
-	-- タイトルタイプライター
+	-- タイプライター
 	task.spawn(function()
 		for i = 1, #titleText do
 			TitleLabel.Text = string.sub(titleText, 1, i)
@@ -348,21 +384,16 @@ function HoloLib:CreateWindow(titleText)
 	Window._Main        = Main
 	Window._TabBar      = TabBar
 	Window._ContentArea = ContentArea
-	Window._Tabs        = {}      -- { button, page, underline }
+	Window._Tabs        = {}
 	Window._ActiveTab   = nil
-	Window._TabOffset   = 0       -- タブボタンの横並びオフセット
+	Window._TabOffset   = 0
 
-	-- ----------------------------------------------------------
-	--  内部：タブ切り替え
-	-- ----------------------------------------------------------
 	local function SwitchTab(target)
 		for _, t in ipairs(Window._Tabs) do
 			local active = (t == target)
 			t.Page.Visible = active
 			t.Underline.Visible = active
-			t.Button.TextColor3 = active
-				and Color3.fromRGB(180, 255, 255)
-				or  Color3.fromRGB(80,  120, 120)
+			t.Button.TextColor3 = active and C_CYAN_LIGHT or C_DARK
 		end
 		Window._ActiveTab = target
 	end
@@ -375,7 +406,6 @@ function HoloLib:CreateWindow(titleText)
 		local TAB_W = 90
 		local TAB_H = 28
 
-		-- タブボタン
 		local Btn = Instance.new("TextButton")
 		Btn.Size = UDim2.fromOffset(TAB_W, TAB_H)
 		Btn.Position = UDim2.fromOffset(self._TabOffset, 0)
@@ -383,7 +413,7 @@ function HoloLib:CreateWindow(titleText)
 		Btn.Text = name
 		Btn.Font = Enum.Font.Code
 		Btn.TextSize = 16
-		Btn.TextColor3 = Color3.fromRGB(80, 120, 120)
+		Btn.TextColor3 = C_DARK
 		Btn.ZIndex = 10
 		Btn.Parent = self._TabBar
 
@@ -391,32 +421,32 @@ function HoloLib:CreateWindow(titleText)
 		Underline.Size = UDim2.new(1, 0, 0, 2)
 		Underline.Position = UDim2.new(0, 0, 1, -2)
 		Underline.BorderSizePixel = 0
-		Underline.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		Underline.BackgroundColor3 = C_CYAN
 		Underline.Visible = false
 		Underline.ZIndex = 10
 		Underline.Parent = Btn
 
-		-- ページ（ScrollingFrame）
 		local Page = Instance.new("ScrollingFrame")
 		Page.Size = UDim2.fromScale(1, 1)
-		Page.Position = UDim2.fromOffset(0, 0)
 		Page.BackgroundTransparency = 1
 		Page.BorderSizePixel = 0
 		Page.ScrollBarThickness = 3
-		Page.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
+		Page.ScrollBarImageColor3 = C_CYAN
 		Page.CanvasSize = UDim2.fromOffset(0, 0)
 		Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		Page.Visible = false
 		Page.Parent = self._ContentArea
 
 		local ListLayout = Instance.new("UIListLayout")
-		ListLayout.Padding = UDim.new(0, 8)
+		ListLayout.Padding = UDim.new(0, 6)
 		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		ListLayout.Parent = Page
 
 		local Padding = Instance.new("UIPadding")
 		Padding.PaddingTop = UDim.new(0, 4)
 		Padding.PaddingBottom = UDim.new(0, 8)
+		Padding.PaddingLeft = UDim.new(0, 2)
+		Padding.PaddingRight = UDim.new(0, 2)
 		Padding.Parent = Page
 
 		local tabEntry = {
@@ -429,7 +459,6 @@ function HoloLib:CreateWindow(titleText)
 		table.insert(self._Tabs, tabEntry)
 		self._TabOffset = self._TabOffset + TAB_W + 8
 
-		-- 最初のタブは自動でアクティブ
 		if #self._Tabs == 1 then
 			SwitchTab(tabEntry)
 		end
@@ -456,36 +485,63 @@ function HoloLib:CreateWindow(titleText)
 
 			local Enabled = (default == true)
 
+			-- 半透明バック
+			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 36), NextOrder())
+
 			local Toggle = Instance.new("TextButton")
-			Toggle.Size = UDim2.new(1, 0, 0, 30)
+			Toggle.Size = UDim2.fromScale(1, 1)
 			Toggle.BackgroundTransparency = 1
 			Toggle.Text = ""
-			Toggle.LayoutOrder = NextOrder()
-			Toggle.Parent = tabEntry.Page
+			Toggle.Parent = Bg
 
+			-- 左：ラベル
 			local NameLabel = Instance.new("TextLabel")
 			NameLabel.BackgroundTransparency = 1
-			NameLabel.Size = UDim2.new(0.7, 0, 1, 0)
+			NameLabel.Size = UDim2.new(0.7, -8, 1, 0)
+			NameLabel.Position = UDim2.fromOffset(10, 0)
 			NameLabel.Text = labelText
 			NameLabel.Font = Enum.Font.Code
-			NameLabel.TextSize = 18
+			NameLabel.TextSize = 17
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			NameLabel.TextColor3 = Color3.fromRGB(180, 255, 255)
+			NameLabel.TextColor3 = C_CYAN_LIGHT
 			NameLabel.Parent = Toggle
 
+			-- 右：ON/OFF バッジ
+			local BadgeBg = Instance.new("Frame")
+			BadgeBg.Size = UDim2.fromOffset(52, 22)
+			BadgeBg.AnchorPoint = Vector2.new(1, 0.5)
+			BadgeBg.Position = UDim2.new(1, -10, 0.5, 0)
+			BadgeBg.BackgroundColor3 = C_BG
+			BadgeBg.BackgroundTransparency = 0.3
+			BadgeBg.BorderSizePixel = 0
+			BadgeBg.Parent = Toggle
+
+			local BadgeCorner = Instance.new("UICorner")
+			BadgeCorner.CornerRadius = UDim.new(0, 4)
+			BadgeCorner.Parent = BadgeBg
+
+			local BadgeStroke = Instance.new("UIStroke")
+			BadgeStroke.Thickness = 1
+			BadgeStroke.Transparency = 0.5
+			BadgeStroke.Parent = BadgeBg
+
 			local StateLabel = Instance.new("TextLabel")
+			StateLabel.Size = UDim2.fromScale(1, 1)
 			StateLabel.BackgroundTransparency = 1
-			StateLabel.Size = UDim2.new(0.3, 0, 1, 0)
-			StateLabel.Position = UDim2.new(0.7, 0, 0, 0)
 			StateLabel.Font = Enum.Font.Code
-			StateLabel.TextSize = 18
-			StateLabel.Parent = Toggle
+			StateLabel.TextSize = 16
+			StateLabel.Parent = BadgeBg
 
 			local function UpdateToggle()
-				StateLabel.Text = Enabled and "ON" or "OFF"
-				StateLabel.TextColor3 = Enabled
-					and Color3.fromRGB(0,  255, 255)
-					or  Color3.fromRGB(80, 120, 120)
+				if Enabled then
+					StateLabel.Text = "ON"
+					StateLabel.TextColor3 = C_CYAN
+					BadgeStroke.Color = C_CYAN
+				else
+					StateLabel.Text = "OFF"
+					StateLabel.TextColor3 = C_DARK
+					BadgeStroke.Color = C_DARK
+				end
 			end
 
 			Toggle.MouseButton1Click:Connect(function()
@@ -496,7 +552,6 @@ function HoloLib:CreateWindow(titleText)
 
 			UpdateToggle()
 
-			-- 戻り値でON/OFFを外部から操作可能
 			local obj = {}
 			function obj:Set(v)
 				Enabled = v
@@ -509,64 +564,73 @@ function HoloLib:CreateWindow(titleText)
 
 		-- --------------------------------------------------------
 		--  Tab:AddSlider(labelText, options, callback)
-		--    options = { Min, Max, Default }
 		-- --------------------------------------------------------
 		function Tab:AddSlider(labelText, options, callback)
 
-			local Min     = options.Min     or 0
-			local Max     = options.Max     or 100
-			local Value   = options.Default or Min
+			local Min   = options.Min     or 0
+			local Max   = options.Max     or 100
+			local Value = options.Default or Min
 
-			local Container = Instance.new("Frame")
-			Container.Size = UDim2.new(1, 0, 0, 50)
-			Container.BackgroundTransparency = 1
-			Container.LayoutOrder = NextOrder()
-			Container.Parent = tabEntry.Page
+			-- 半透明バック（ラベル行 + スライダー行）
+			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 56), NextOrder())
 
+			-- ラベル行
 			local NameLabel = Instance.new("TextLabel")
-			NameLabel.Size = UDim2.new(1, 0, 0, 20)
+			NameLabel.Size = UDim2.new(0.65, 0, 0, 24)
+			NameLabel.Position = UDim2.fromOffset(10, 4)
 			NameLabel.BackgroundTransparency = 1
 			NameLabel.Text = labelText
 			NameLabel.Font = Enum.Font.Code
 			NameLabel.TextSize = 16
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			NameLabel.TextColor3 = Color3.fromRGB(180, 255, 255)
-			NameLabel.Parent = Container
-
-			local SliderFrame = Instance.new("Frame")
-			SliderFrame.Size = UDim2.new(1, 0, 0, 30)
-			SliderFrame.Position = UDim2.fromOffset(0, 20)
-			SliderFrame.BackgroundTransparency = 1
-			SliderFrame.Parent = Container
-
-			local Track = Instance.new("Frame")
-			Track.Size = UDim2.new(1, -40, 0, 2)
-			Track.Position = UDim2.new(0, 0, 0.5, -1)
-			Track.BorderSizePixel = 0
-			Track.BackgroundColor3 = Color3.fromRGB(40, 120, 120)
-			Track.Parent = SliderFrame
-
-			local Fill = Instance.new("Frame")
-			Fill.BorderSizePixel = 0
-			Fill.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-			Fill.Parent = Track
-
-			local Knob = Instance.new("Frame")
-			Knob.Size = UDim2.fromOffset(10, 10)
-			Knob.AnchorPoint = Vector2.new(0.5, 0.5)
-			Knob.BorderSizePixel = 0
-			Knob.BackgroundColor3 = Color3.fromRGB(180, 255, 255)
-			Knob.Parent = SliderFrame
+			NameLabel.TextColor3 = C_CYAN_LIGHT
+			NameLabel.Parent = Bg
 
 			local ValueLabel = Instance.new("TextLabel")
-			ValueLabel.Size = UDim2.fromOffset(35, 20)
-			ValueLabel.Position = UDim2.new(1, -35, 0, 0)
+			ValueLabel.Size = UDim2.new(0.3, -10, 0, 24)
+			ValueLabel.Position = UDim2.new(0.7, 0, 0, 4)
 			ValueLabel.BackgroundTransparency = 1
 			ValueLabel.Font = Enum.Font.Code
 			ValueLabel.TextSize = 16
-			ValueLabel.TextColor3 = Color3.fromRGB(180, 255, 255)
+			ValueLabel.TextColor3 = C_CYAN
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-			ValueLabel.Parent = SliderFrame
+			ValueLabel.Parent = Bg
+
+			-- トラック行
+			local TrackBg = Instance.new("Frame")
+			TrackBg.Size = UDim2.new(1, -20, 0, 6)
+			TrackBg.Position = UDim2.new(0, 10, 0, 34)
+			TrackBg.BackgroundColor3 = Color3.fromRGB(20, 60, 60)
+			TrackBg.BackgroundTransparency = 0.2
+			TrackBg.BorderSizePixel = 0
+			TrackBg.Parent = Bg
+
+			local TrackCorner = Instance.new("UICorner")
+			TrackCorner.CornerRadius = UDim.new(1, 0)
+			TrackCorner.Parent = TrackBg
+
+			local Fill = Instance.new("Frame")
+			Fill.Size = UDim2.new(0, 0, 1, 0)
+			Fill.BackgroundColor3 = C_CYAN
+			Fill.BorderSizePixel = 0
+			Fill.Parent = TrackBg
+
+			local FillCorner = Instance.new("UICorner")
+			FillCorner.CornerRadius = UDim.new(1, 0)
+			FillCorner.Parent = Fill
+
+			local Knob = Instance.new("Frame")
+			Knob.Size = UDim2.fromOffset(14, 14)
+			Knob.AnchorPoint = Vector2.new(0.5, 0.5)
+			Knob.Position = UDim2.new(0, 0, 0.5, 0)
+			Knob.BackgroundColor3 = C_CYAN_LIGHT
+			Knob.BorderSizePixel = 0
+			Knob.ZIndex = 2
+			Knob.Parent = TrackBg
+
+			local KnobCorner = Instance.new("UICorner")
+			KnobCorner.CornerRadius = UDim.new(1, 0)
+			KnobCorner.Parent = Knob
 
 			local SliderDragging = false
 
@@ -578,8 +642,8 @@ function HoloLib:CreateWindow(titleText)
 			end
 
 			local function SetFromPosition(X)
-				local TrackStart = Track.AbsolutePosition.X
-				local TrackWidth = Track.AbsoluteSize.X
+				local TrackStart = TrackBg.AbsolutePosition.X
+				local TrackWidth = TrackBg.AbsoluteSize.X
 				local Percent = math.clamp((X - TrackStart) / TrackWidth, 0, 1)
 				Value = Min + (Max - Min) * Percent
 				UpdateSlider()
@@ -600,7 +664,7 @@ function HoloLib:CreateWindow(titleText)
 				end
 			end)
 
-			Track.InputBegan:Connect(function(Input)
+			TrackBg.InputBegan:Connect(function(Input)
 				if Input.UserInputType == Enum.UserInputType.MouseButton1
 				or Input.UserInputType == Enum.UserInputType.Touch then
 					SetFromPosition(Input.Position.X)
@@ -636,20 +700,21 @@ function HoloLib:CreateWindow(titleText)
 
 		-- --------------------------------------------------------
 		--  Tab:AddLabel(text)
-		--    リアルタイム更新向きテキストラベル
 		-- --------------------------------------------------------
 		function Tab:AddLabel(text)
 
+			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 30), NextOrder())
+
 			local Label = Instance.new("TextLabel")
-			Label.Size = UDim2.new(1, 0, 0, 25)
+			Label.Size = UDim2.new(1, -10, 1, 0)
+			Label.Position = UDim2.fromOffset(10, 0)
 			Label.BackgroundTransparency = 1
 			Label.Text = text or ""
 			Label.Font = Enum.Font.Code
-			Label.TextSize = 16
-			Label.TextColor3 = Color3.fromRGB(180, 255, 255)
+			Label.TextSize = 15
+			Label.TextColor3 = C_CYAN_LIGHT
 			Label.TextXAlignment = Enum.TextXAlignment.Left
-			Label.LayoutOrder = NextOrder()
-			Label.Parent = tabEntry.Page
+			Label.Parent = Bg
 
 			local obj = {}
 			function obj:Set(v) Label.Text = tostring(v) end
@@ -658,54 +723,62 @@ function HoloLib:CreateWindow(titleText)
 		end
 
 		-- --------------------------------------------------------
-		--  Tab:AddParagraph(title, description)
-		--    説明用ブロック（自動高さ調整）
+		--  Tab:AddParagraph(titleText, descText)
 		-- --------------------------------------------------------
 		function Tab:AddParagraph(titleText, descText)
 
-			local Para = Instance.new("Frame")
-			Para.Size = UDim2.fromOffset(560, 60)
-			Para.BackgroundTransparency = 1
-			Para.LayoutOrder = NextOrder()
-			Para.Parent = tabEntry.Page
+			-- 外枠（高さは後で自動調整）
+			local Bg = Instance.new("Frame")
+			Bg.Size = UDim2.new(1, 0, 0, 60)
+			Bg.BackgroundColor3 = C_BG
+			Bg.BackgroundTransparency = 0.55
+			Bg.BorderSizePixel = 0
+			Bg.LayoutOrder = NextOrder()
+			Bg.Parent = tabEntry.Page
+
+			local BgCorner = Instance.new("UICorner")
+			BgCorner.CornerRadius = UDim.new(0, 4)
+			BgCorner.Parent = Bg
 
 			local TopLine = Instance.new("Frame")
 			TopLine.Size = UDim2.new(1, 0, 0, 2)
 			TopLine.BorderSizePixel = 0
-			TopLine.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-			TopLine.Parent = Para
+			TopLine.BackgroundColor3 = C_CYAN
+			TopLine.Parent = Bg
 
 			local BottomLine = Instance.new("Frame")
 			BottomLine.BorderSizePixel = 0
-			BottomLine.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-			BottomLine.Parent = Para
+			BottomLine.BackgroundColor3 = C_CYAN
+			BottomLine.Parent = Bg
 
 			local TitleLbl = Instance.new("TextLabel")
-			TitleLbl.Size = UDim2.new(1, 0, 0, 20)
+			TitleLbl.Size = UDim2.new(1, -10, 0, 22)
+			TitleLbl.Position = UDim2.fromOffset(8, 2)
 			TitleLbl.BackgroundTransparency = 1
 			TitleLbl.Text = titleText or ""
 			TitleLbl.Font = Enum.Font.Code
-			TitleLbl.TextSize = 16
-			TitleLbl.TextColor3 = Color3.fromRGB(180, 255, 255)
-			TitleLbl.Parent = Para
+			TitleLbl.TextSize = 15
+			TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLbl.TextColor3 = C_CYAN_LIGHT
+			TitleLbl.Parent = Bg
 
 			local Desc = Instance.new("TextLabel")
-			Desc.Size = UDim2.new(1, -10, 0, 0)
-			Desc.Position = UDim2.fromOffset(5, 25)
+			Desc.Size = UDim2.new(1, -16, 0, 0)
+			Desc.Position = UDim2.fromOffset(8, 26)
 			Desc.BackgroundTransparency = 1
 			Desc.AutomaticSize = Enum.AutomaticSize.Y
 			Desc.TextWrapped = true
 			Desc.TextYAlignment = Enum.TextYAlignment.Top
 			Desc.TextXAlignment = Enum.TextXAlignment.Left
 			Desc.Font = Enum.Font.Code
-			Desc.TextSize = 14
-			Desc.TextColor3 = Color3.fromRGB(180, 255, 255)
+			Desc.TextSize = 13
+			Desc.TextColor3 = C_CYAN_MID
 			Desc.Text = descText or ""
-			Desc.Parent = Para
+			Desc.Parent = Bg
 
 			local function UpdateSize()
 				local H = 30 + Desc.TextBounds.Y + 10
-				Para.Size = UDim2.fromOffset(560, H)
+				Bg.Size = UDim2.new(1, 0, 0, H)
 				BottomLine.Position = UDim2.new(0, 0, 1, -2)
 				BottomLine.Size = UDim2.new(1, 0, 0, 2)
 			end
@@ -733,47 +806,63 @@ function HoloLib:CreateWindow(titleText)
 		duration = duration or 3
 
 		local Notification = Instance.new("Frame")
-		Notification.Size = UDim2.fromOffset(250, 70)
-		Notification.Position = UDim2.new(1, 260, 0, 20)
-		Notification.BackgroundTransparency = 0.92
-		Notification.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+		Notification.Size = UDim2.fromOffset(260, 72)
+		Notification.Position = UDim2.new(1, 270, 0, 20)
+		Notification.BackgroundColor3 = C_BG
+		Notification.BackgroundTransparency = 0.35
+		Notification.BorderSizePixel = 0
 		Notification.Parent = self._ScreenGui
 
+		local NCorner = Instance.new("UICorner")
+		NCorner.CornerRadius = UDim.new(0, 6)
+		NCorner.Parent = Notification
+
 		local NStroke = Instance.new("UIStroke")
-		NStroke.Color = Color3.fromRGB(0, 255, 255)
+		NStroke.Color = C_CYAN
+		NStroke.Thickness = 1
 		NStroke.Parent = Notification
 
+		-- タイトル上部アクセントライン
+		local AccentLine = Instance.new("Frame")
+		AccentLine.Size = UDim2.new(1, 0, 0, 2)
+		AccentLine.BorderSizePixel = 0
+		AccentLine.BackgroundColor3 = C_CYAN
+		AccentLine.Parent = Notification
+
 		local TitleLbl = Instance.new("TextLabel")
-		TitleLbl.Size = UDim2.new(1, -10, 0, 25)
-		TitleLbl.Position = UDim2.fromOffset(5, 0)
+		TitleLbl.Size = UDim2.new(1, -10, 0, 26)
+		TitleLbl.Position = UDim2.fromOffset(8, 4)
 		TitleLbl.BackgroundTransparency = 1
 		TitleLbl.Text = title
 		TitleLbl.Font = Enum.Font.Code
-		TitleLbl.TextSize = 18
-		TitleLbl.TextColor3 = Color3.fromRGB(180, 255, 255)
+		TitleLbl.TextSize = 17
+		TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+		TitleLbl.TextColor3 = C_CYAN_LIGHT
 		TitleLbl.Parent = Notification
 
 		local MsgLbl = Instance.new("TextLabel")
-		MsgLbl.Size = UDim2.new(1, -10, 1, -25)
-		MsgLbl.Position = UDim2.fromOffset(5, 25)
+		MsgLbl.Size = UDim2.new(1, -10, 0, 36)
+		MsgLbl.Position = UDim2.fromOffset(8, 32)
 		MsgLbl.BackgroundTransparency = 1
 		MsgLbl.Text = message
 		MsgLbl.Font = Enum.Font.Code
-		MsgLbl.TextSize = 14
-		MsgLbl.TextColor3 = Color3.fromRGB(180, 255, 255)
+		MsgLbl.TextSize = 13
+		MsgLbl.TextXAlignment = Enum.TextXAlignment.Left
+		MsgLbl.TextWrapped = true
+		MsgLbl.TextColor3 = C_CYAN_MID
 		MsgLbl.Parent = Notification
 
 		TweenService:Create(
 			Notification,
-			TweenInfo.new(0.25),
-			{ Position = UDim2.new(1, -260, 0, 20) }
+			TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ Position = UDim2.new(1, -270, 0, 20) }
 		):Play()
 
 		task.delay(duration, function()
 			local T = TweenService:Create(
 				Notification,
-				TweenInfo.new(0.25),
-				{ Position = UDim2.new(1, 260, 0, 20) }
+				TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+				{ Position = UDim2.new(1, 270, 0, 20) }
 			)
 			T:Play()
 			T.Completed:Wait()
@@ -785,6 +874,6 @@ function HoloLib:CreateWindow(titleText)
 end
 
 -- ============================================================
---  エントリーポイント：loadstring(...)(） で返るテーブル
+--  エントリーポイント
 -- ============================================================
 return HoloLib

@@ -336,14 +336,37 @@ function HertaIX:CreateWindow(titleText)
 	end)
 
 	-- 最小化
+	-- AnchorPointを(0.5,0)に切り替えて上端基準で畳む
 	local FullSize = Main.Size
 	local Minimized = false
 
 	Minimize.MouseButton1Click:Connect(function()
 		Minimized = not Minimized
-		Main.Size = Minimized
-			and UDim2.new(FullSize.X.Scale, FullSize.X.Offset, 0, 60)
-			or FullSize
+
+		if Minimized then
+			-- 現在の中心位置から上端位置を計算してAnchorPointを切り替える
+			local absPos  = Main.AbsolutePosition
+			local absSize = Main.AbsoluteSize
+			local screenH = workspace.CurrentCamera.ViewportSize.Y
+			local screenW = workspace.CurrentCamera.ViewportSize.X
+			-- 上端 Y を画面相対座標に変換
+			local topY = absPos.Y
+			local centerX = absPos.X + absSize.X / 2
+			Main.AnchorPoint = Vector2.new(0.5, 0)
+			Main.Position = UDim2.new(0, centerX, 0, topY)
+			TweenService:Create(
+				Main,
+				TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+				{ Size = UDim2.new(FullSize.X.Scale, FullSize.X.Offset, 0, 55) }
+			):Play()
+		else
+			-- 展開時：上端位置を保ったまま元のサイズに戻す
+			TweenService:Create(
+				Main,
+				TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+				{ Size = FullSize }
+			):Play()
+		end
 	end)
 
 	-- 閉じる

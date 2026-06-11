@@ -605,7 +605,7 @@ function HertaIX:CreateWindow(titleText)
 	local MiniBar = Instance.new("TextButton")
 	MiniBar.Size = UDim2.fromOffset(220, 28)
 	MiniBar.AnchorPoint = Vector2.new(0.5, 0)
-	MiniBar.Position = UDim2.new(0.5, 0, 0, -40)  -- 最初は画面外
+	MiniBar.Position = UDim2.new(0.5, 0, 0, -80)  -- 最初は画面外（十分上に隠す）
 	MiniBar.BackgroundColor3 = C_BG
 	MiniBar.BackgroundTransparency = 0.2
 	MiniBar.BorderSizePixel = 0
@@ -1356,8 +1356,21 @@ function HertaIX:CreateWindow(titleText)
 
 	-- ----------------------------------------------------------
 	--  CONFIG タブ（自動生成）
+	--  Window:CreateTab() を上書きして、CONFIG は常に最後尾に再配置する
 	-- ----------------------------------------------------------
-	local ConfigTab = Window:CreateTab("CONFIG")
+
+	-- CONFIG タブを生成し、ユーザーが CreateTab を呼ぶたびに末尾へ再配置する
+	local _OrigCreateTab = Window.CreateTab
+	local ConfigTab = _OrigCreateTab(Window, "CONFIG")
+	local _ConfigEntry = ConfigTab._Entry
+
+	function Window:CreateTab(name)
+		-- 新しいタブを追加する前に CONFIG ボタンを一時退避
+		local tab = _OrigCreateTab(self, name)
+		-- 新タブが追加された後、CONFIG ボタンを現在の末尾へ移動
+		_ConfigEntry.Button.Position = UDim2.fromOffset(self._TabOffset - (90 + 8), 0)
+		return tab
+	end
 
 	local ThemeOrder = {
 		"near_future", "gameboy", "rainbow_B", "rainbow_W",

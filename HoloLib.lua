@@ -1,5 +1,5 @@
 -- ============================================================
---  HoloLib  |  Hologram GUI Library
+--  Herta IX Library  |  Hologram GUI Library
 --  loadstring 対応ライブラリ
 -- ============================================================
 
@@ -49,47 +49,53 @@ local function MakeCorner(parent, xScale, yScale)
 	V.Parent = parent
 end
 
--- 半透明バック＋細枠を持つ汎用コンテナを生成する
--- parent    : 親インスタンス
--- size      : UDim2
+-- Herta IX デザインフレーム：半透明バック＋UIStroke＋4隅L字コーナー
+-- parent      : 親インスタンス
+-- size        : UDim2
 -- layoutOrder : number
--- returns   : Frame (内側に子を追加する対象)
-local function MakeBgFrame(parent, size, layoutOrder)
+-- returns     : Frame (内側に子を追加する対象)
+local function MakeHertaFrame(parent, size, layoutOrder)
 	local Bg = Instance.new("Frame")
 	Bg.Size = size
 	Bg.BackgroundColor3 = C_BG
 	Bg.BackgroundTransparency = 0.45
 	Bg.BorderSizePixel = 0
 	Bg.LayoutOrder = layoutOrder
+	Bg.ClipsDescendants = false
 	Bg.Parent = parent
 
 	local Stroke = Instance.new("UIStroke")
 	Stroke.Color = C_CYAN
 	Stroke.Thickness = 1
-	Stroke.Transparency = 0.7
+	Stroke.Transparency = 0.5
 	Stroke.Parent = Bg
 
-	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 4)
-	Corner.Parent = Bg
+	-- 4隅のL字コーナー（メインフレームと同じデザイン）
+	MakeCorner(Bg, 0, 0)
+	MakeCorner(Bg, 1, 0)
+	MakeCorner(Bg, 0, 1)
+	MakeCorner(Bg, 1, 1)
 
 	return Bg
 end
+
+-- 後方互換エイリアス
+local MakeBgFrame = MakeHertaFrame
 
 -- ============================================================
 --  ライブラリ本体
 -- ============================================================
 
-local HoloLib = {}
-HoloLib.__index = HoloLib
+local HertaIX = {}
+HertaIX.__index = HertaIX
 
 -- ------------------------------------------------------------
 --  CreateWindow(titleText)
 -- ------------------------------------------------------------
-function HoloLib:CreateWindow(titleText)
+function HertaIX:CreateWindow(titleText)
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "HologramGUI"
+	ScreenGui.Name = "HertaIXGui"
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.Parent = PlayerGui
@@ -1023,4 +1029,4 @@ end
 -- ============================================================
 --  エントリーポイント
 -- ============================================================
-return HoloLib
+return HertaIX

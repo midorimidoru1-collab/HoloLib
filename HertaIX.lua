@@ -12,21 +12,249 @@ local LP        = Players.LocalPlayer
 local PlayerGui = LP:WaitForChild("PlayerGui")
 
 -- ============================================================
---  共通カラー定数
+--  カラーテーマ定義
 -- ============================================================
-local C_CYAN       = Color3.fromRGB(0,   255, 255)
-local C_CYAN_MID   = Color3.fromRGB(150, 255, 255)
-local C_CYAN_LIGHT = Color3.fromRGB(180, 255, 255)
-local C_CYAN_TEXT  = Color3.fromRGB(200, 255, 255)
-local C_DARK       = Color3.fromRGB(80,  120, 120)
--- 半透明バック用：暗い青黒
-local C_BG         = Color3.fromRGB(4,   18,  22)
+local Themes = {
+	near_future = {
+		accent    = Color3.fromRGB(0,   255, 255),
+		accentMid = Color3.fromRGB(150, 255, 255),
+		accentLt  = Color3.fromRGB(180, 255, 255),
+		text      = Color3.fromRGB(200, 255, 255),
+		dark      = Color3.fromRGB(80,  120, 120),
+		bg        = Color3.fromRGB(4,   18,  22),
+		bgAlpha   = 0.45,
+		mainAlpha = 0.93,
+		mainBg    = Color3.fromRGB(0,   255, 255),
+		rainbow   = false,
+	},
+	gameboy = {
+		accent    = Color3.fromRGB(106, 190, 48),
+		accentMid = Color3.fromRGB(80,  160, 30),
+		accentLt  = Color3.fromRGB(130, 210, 70),
+		text      = Color3.fromRGB(15,  30,  10),
+		dark      = Color3.fromRGB(60,  100, 30),
+		bg        = Color3.fromRGB(15,  30,  10),
+		bgAlpha   = 0.30,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(106, 190, 48),
+		rainbow   = false,
+	},
+	rainbow_B = {
+		accent    = Color3.fromRGB(255, 0,   0),
+		accentMid = Color3.fromRGB(255, 128, 0),
+		accentLt  = Color3.fromRGB(255, 255, 0),
+		text      = Color3.fromRGB(10,  10,  10),
+		dark      = Color3.fromRGB(80,  80,  80),
+		bg        = Color3.fromRGB(10,  10,  10),
+		bgAlpha   = 0.30,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(255, 0,   0),
+		rainbow   = true,
+		textRainbow = false,
+	},
+	rainbow_W = {
+		accent    = Color3.fromRGB(255, 0,   0),
+		accentMid = Color3.fromRGB(255, 128, 0),
+		accentLt  = Color3.fromRGB(255, 255, 0),
+		text      = Color3.fromRGB(255, 255, 255),
+		dark      = Color3.fromRGB(180, 180, 180),
+		bg        = Color3.fromRGB(10,  10,  10),
+		bgAlpha   = 0.30,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(255, 0,   0),
+		rainbow   = true,
+		textRainbow = false,
+	},
+	monotone = {
+		accent    = Color3.fromRGB(255, 255, 255),
+		accentMid = Color3.fromRGB(200, 200, 200),
+		accentLt  = Color3.fromRGB(220, 220, 220),
+		text      = Color3.fromRGB(10,  10,  10),
+		dark      = Color3.fromRGB(100, 100, 100),
+		bg        = Color3.fromRGB(10,  10,  10),
+		bgAlpha   = 0.35,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(255, 255, 255),
+		rainbow   = false,
+	},
+	undertale = {
+		accent    = Color3.fromRGB(10,  10,  10),
+		accentMid = Color3.fromRGB(40,  40,  40),
+		accentLt  = Color3.fromRGB(60,  60,  60),
+		text      = Color3.fromRGB(10,  10,  10),
+		dark      = Color3.fromRGB(150, 150, 150),
+		bg        = Color3.fromRGB(240, 240, 240),
+		bgAlpha   = 0.20,
+		mainAlpha = 0.88,
+		mainBg    = Color3.fromRGB(10,  10,  10),
+		rainbow   = false,
+	},
+	leaf = {
+		accent    = Color3.fromRGB(0,   100, 30),
+		accentMid = Color3.fromRGB(80,  200, 80),
+		accentLt  = Color3.fromRGB(140, 240, 100),
+		text      = Color3.fromRGB(140, 240, 100),
+		dark      = Color3.fromRGB(40,  80,  40),
+		bg        = Color3.fromRGB(5,   20,  5),
+		bgAlpha   = 0.40,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(0,   100, 30),
+		rainbow   = false,
+	},
+	herta = {
+		accent    = Color3.fromRGB(180, 120, 220),
+		accentMid = Color3.fromRGB(140, 80,  200),
+		accentLt  = Color3.fromRGB(200, 160, 240),
+		text      = Color3.fromRGB(80,  20,  140),
+		dark      = Color3.fromRGB(120, 80,  160),
+		bg        = Color3.fromRGB(30,  10,  50),
+		bgAlpha   = 0.40,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(180, 120, 220),
+		rainbow   = false,
+	},
+	king = {
+		accent    = Color3.fromRGB(200, 160, 0),
+		accentMid = Color3.fromRGB(180, 140, 0),
+		accentLt  = Color3.fromRGB(220, 180, 20),
+		text      = Color3.fromRGB(200, 160, 0),
+		dark      = Color3.fromRGB(120, 90,  0),
+		bg        = Color3.fromRGB(20,  15,  0),
+		bgAlpha   = 0.40,
+		mainAlpha = 0.92,
+		mainBg    = Color3.fromRGB(200, 160, 0),
+		rainbow   = false,
+	},
+}
+
+-- ============================================================
+--  動的カラー変数（テーマ切り替えで上書きされる）
+-- ============================================================
+local C_ACCENT     = Themes.near_future.accent
+local C_ACCENT_MID = Themes.near_future.accentMid
+local C_ACCENT_LT  = Themes.near_future.accentLt
+local C_TEXT       = Themes.near_future.text
+local C_DARK       = Themes.near_future.dark
+local C_BG         = Themes.near_future.bg
+
+-- 後方互換エイリアス
+local C_CYAN       = C_ACCENT
+local C_CYAN_MID   = C_ACCENT_MID
+local C_CYAN_LIGHT = C_ACCENT_LT
+local C_CYAN_TEXT  = C_TEXT
+
+-- テーマ変更時に更新が必要なオブジェクトを登録するテーブル
+local ThemeListeners = {}  -- { type="stroke"|"bg"|"corner"|"text"|"mainbg", obj=Instance, ... }
+local RainbowConns   = {}  -- rainbow アニメ用接続
+
+local function RainbowColor(hue)
+	return Color3.fromHSV(hue % 1, 1, 1)
+end
+
+local function ClearRainbow()
+	for _, c in ipairs(RainbowConns) do c:Disconnect() end
+	RainbowConns = {}
+end
+
+local function ApplyTheme(name)
+	local T = Themes[name]
+	if not T then return end
+
+	ClearRainbow()
+
+	-- 動的変数を更新
+	C_ACCENT     = T.accent
+	C_ACCENT_MID = T.accentMid
+	C_ACCENT_LT  = T.accentLt
+	C_TEXT       = T.text
+	C_DARK       = T.dark
+	C_BG         = T.bg
+	C_CYAN       = C_ACCENT
+	C_CYAN_MID   = C_ACCENT_MID
+	C_CYAN_LIGHT = C_ACCENT_LT
+	C_CYAN_TEXT  = C_TEXT
+
+	-- 登録済みオブジェクトに即時適用
+	for _, entry in ipairs(ThemeListeners) do
+		local ok, obj = pcall(function() return entry.obj end)
+		if not ok or not obj or not obj.Parent then continue end
+
+		if entry.type == "stroke" then
+			obj.Color = C_ACCENT
+		elseif entry.type == "corner_h" or entry.type == "corner_v" then
+			obj.BackgroundColor3 = C_ACCENT
+		elseif entry.type == "bg" then
+			obj.BackgroundColor3 = C_BG
+			obj.BackgroundTransparency = T.bgAlpha
+		elseif entry.type == "mainbg" then
+			obj.BackgroundColor3 = T.mainBg
+			obj.BackgroundTransparency = T.mainAlpha
+		elseif entry.type == "text_accent" then
+			obj.TextColor3 = C_ACCENT
+		elseif entry.type == "text_lt" then
+			obj.TextColor3 = C_ACCENT_LT
+		elseif entry.type == "text_mid" then
+			obj.TextColor3 = C_ACCENT_MID
+		elseif entry.type == "text_main" then
+			obj.TextColor3 = C_TEXT
+		elseif entry.type == "text_dark" then
+			obj.TextColor3 = C_DARK
+		elseif entry.type == "fill" then
+			obj.BackgroundColor3 = C_ACCENT
+		elseif entry.type == "track" then
+			obj.BackgroundColor3 = C_BG
+		elseif entry.type == "knob" then
+			obj.BackgroundColor3 = C_ACCENT_LT
+		elseif entry.type == "underline" then
+			obj.BackgroundColor3 = C_ACCENT
+		elseif entry.type == "badge_on_stroke" then
+			-- 状態依存なので何もしない（UpdateToggle側で処理）
+		elseif entry.type == "headerline" then
+			obj.BackgroundColor3 = C_ACCENT
+		elseif entry.type == "scanline" then
+			obj.BackgroundColor3 = C_ACCENT
+		elseif entry.type == "sweep" then
+			obj.BackgroundColor3 = C_ACCENT_LT
+		elseif entry.type == "dataline" then
+			obj.BackgroundColor3 = C_ACCENT_MID
+		end
+	end
+
+	-- rainbow アニメ
+	if T.rainbow then
+		local conn = RunService.RenderStepped:Connect(function()
+			local hue = (tick() * 0.2) % 1
+			local col = RainbowColor(hue)
+			for _, entry in ipairs(ThemeListeners) do
+				local ok2, obj2 = pcall(function() return entry.obj end)
+				if not ok2 or not obj2 or not obj2.Parent then continue end
+				if entry.type == "stroke"
+				or entry.type == "corner_h"
+				or entry.type == "corner_v"
+				or entry.type == "fill"
+				or entry.type == "underline"
+				or entry.type == "headerline"
+				or entry.type == "mainbg" then
+					obj2.BackgroundColor3 = col
+					if entry.type == "mainbg" then
+						obj2.BackgroundTransparency = T.mainAlpha
+					end
+				elseif entry.type == "stroke" then
+					obj2.Color = col
+				elseif entry.type == "text_accent" then
+					obj2.TextColor3 = col
+				end
+			end
+		end)
+		table.insert(RainbowConns, conn)
+	end
+end
 
 -- ============================================================
 --  内部ユーティリティ
 -- ============================================================
 
--- コーナー装飾
+-- コーナー装飾（登録付き）
 local function MakeCorner(parent, xScale, yScale)
 	local H = Instance.new("Frame")
 	H.BorderSizePixel = 0
@@ -35,8 +263,9 @@ local function MakeCorner(parent, xScale, yScale)
 		xScale, xScale == 1 and -35 or 0,
 		yScale, yScale == 1 and -3  or 0
 	)
-	H.BackgroundColor3 = C_CYAN
+	H.BackgroundColor3 = C_ACCENT
 	H.Parent = parent
+	table.insert(ThemeListeners, { type = "corner_h", obj = H })
 
 	local V = Instance.new("Frame")
 	V.BorderSizePixel = 0
@@ -45,15 +274,12 @@ local function MakeCorner(parent, xScale, yScale)
 		xScale, xScale == 1 and -3  or 0,
 		yScale, yScale == 1 and -35 or 0
 	)
-	V.BackgroundColor3 = C_CYAN
+	V.BackgroundColor3 = C_ACCENT
 	V.Parent = parent
+	table.insert(ThemeListeners, { type = "corner_v", obj = V })
 end
 
--- Herta IX デザインフレーム：半透明バック＋UIStroke＋4隅L字コーナー
--- parent      : 親インスタンス
--- size        : UDim2
--- layoutOrder : number
--- returns     : Frame (内側に子を追加する対象)
+-- Herta IX デザインフレーム
 local function MakeHertaFrame(parent, size, layoutOrder)
 	local Bg = Instance.new("Frame")
 	Bg.Size = size
@@ -63,14 +289,15 @@ local function MakeHertaFrame(parent, size, layoutOrder)
 	Bg.LayoutOrder = layoutOrder
 	Bg.ClipsDescendants = false
 	Bg.Parent = parent
+	table.insert(ThemeListeners, { type = "bg", obj = Bg })
 
 	local Stroke = Instance.new("UIStroke")
-	Stroke.Color = C_CYAN
+	Stroke.Color = C_ACCENT
 	Stroke.Thickness = 1
 	Stroke.Transparency = 0.5
 	Stroke.Parent = Bg
+	table.insert(ThemeListeners, { type = "stroke", obj = Stroke })
 
-	-- 4隅のL字コーナー（メインフレームと同じデザイン）
 	MakeCorner(Bg, 0, 0)
 	MakeCorner(Bg, 1, 0)
 	MakeCorner(Bg, 0, 1)
@@ -79,7 +306,6 @@ local function MakeHertaFrame(parent, size, layoutOrder)
 	return Bg
 end
 
--- 後方互換エイリアス
 local MakeBgFrame = MakeHertaFrame
 
 -- ============================================================
@@ -104,16 +330,18 @@ function HertaIX:CreateWindow(titleText)
 	Main.Size = UDim2.fromOffset(600, 380)
 	Main.Position = UDim2.fromScale(0.5, 0.5)
 	Main.AnchorPoint = Vector2.new(0.5, 0.5)
-	Main.BackgroundColor3 = C_CYAN
+	Main.BackgroundColor3 = C_ACCENT
 	Main.BackgroundTransparency = 0.93
 	Main.BorderSizePixel = 0
 	Main.ClipsDescendants = true
 	Main.Parent = ScreenGui
+	table.insert(ThemeListeners, { type = "mainbg", obj = Main })
 
 	local Stroke = Instance.new("UIStroke")
-	Stroke.Color = C_CYAN
+	Stroke.Color = C_ACCENT
 	Stroke.Thickness = 2
 	Stroke.Parent = Main
+	table.insert(ThemeListeners, { type = "stroke", obj = Stroke })
 
 	local Inner = Instance.new("Frame")
 	Inner.Size = UDim2.new(1, -12, 1, -12)
@@ -123,9 +351,10 @@ function HertaIX:CreateWindow(titleText)
 	Inner.Parent = Main
 
 	local InnerStroke = Instance.new("UIStroke")
-	InnerStroke.Color = C_CYAN_MID
+	InnerStroke.Color = C_ACCENT_MID
 	InnerStroke.Thickness = 1
 	InnerStroke.Parent = Inner
+	table.insert(ThemeListeners, { type = "stroke", obj = InnerStroke })
 
 	MakeCorner(Main, 0, 0)
 	MakeCorner(Main, 1, 0)
@@ -144,17 +373,19 @@ function HertaIX:CreateWindow(titleText)
 		Scan.BorderSizePixel = 0
 		Scan.Size = UDim2.new(1, 0, 0, 1)
 		Scan.Position = UDim2.new(0, 0, 0, i * 5)
-		Scan.BackgroundColor3 = C_CYAN
+		Scan.BackgroundColor3 = C_ACCENT
 		Scan.BackgroundTransparency = 0.97
 		Scan.Parent = ScanLayer
+		table.insert(ThemeListeners, { type = "scanline", obj = Scan })
 	end
 
 	local Sweep = Instance.new("Frame")
 	Sweep.BorderSizePixel = 0
 	Sweep.Size = UDim2.new(1, 0, 0, 40)
-	Sweep.BackgroundColor3 = C_CYAN_LIGHT
+	Sweep.BackgroundColor3 = C_ACCENT_LT
 	Sweep.BackgroundTransparency = 0.95
 	Sweep.Parent = ScanLayer
+	table.insert(ThemeListeners, { type = "sweep", obj = Sweep })
 
 	task.spawn(function()
 		while ScreenGui.Parent do
@@ -184,8 +415,9 @@ function HertaIX:CreateWindow(titleText)
 			Line.BorderSizePixel = 0
 			Line.Size = UDim2.fromOffset(Len, 2)
 			Line.Position = UDim2.new(0, -Len, 0, math.random(60, 360))
-			Line.BackgroundColor3 = C_CYAN_MID
+			Line.BackgroundColor3 = C_ACCENT_MID
 			Line.Parent = DataLayer
+			table.insert(ThemeListeners, { type = "dataline", obj = Line })
 
 			local G = Instance.new("UIGradient")
 			G.Transparency = NumberSequence.new{
@@ -215,10 +447,11 @@ function HertaIX:CreateWindow(titleText)
 	TitleLabel.Text = ""
 	TitleLabel.Font = Enum.Font.Code
 	TitleLabel.TextSize = 28
-	TitleLabel.TextColor3 = C_CYAN_TEXT
+	TitleLabel.TextColor3 = C_TEXT
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.ZIndex = 10
 	TitleLabel.Parent = Main
+	table.insert(ThemeListeners, { type = "text_main", obj = TitleLabel })
 
 	local Cursor = Instance.new("TextLabel")
 	Cursor.Size = UDim2.fromOffset(20, 40)
@@ -227,9 +460,10 @@ function HertaIX:CreateWindow(titleText)
 	Cursor.Text = "_"
 	Cursor.Font = Enum.Font.Code
 	Cursor.TextSize = 28
-	Cursor.TextColor3 = C_CYAN_TEXT
+	Cursor.TextColor3 = C_TEXT
 	Cursor.ZIndex = 10
 	Cursor.Parent = Main
+	table.insert(ThemeListeners, { type = "text_main", obj = Cursor })
 
 	-- ヘッダー：最小化ボタン
 	local Minimize = Instance.new("TextButton")
@@ -239,11 +473,12 @@ function HertaIX:CreateWindow(titleText)
 	Minimize.Text = "-"
 	Minimize.Font = Enum.Font.Code
 	Minimize.TextSize = 24
-	Minimize.TextColor3 = C_CYAN_LIGHT
+	Minimize.TextColor3 = C_ACCENT_LT
 	Minimize.ZIndex = 10
 	Minimize.Parent = Main
+	table.insert(ThemeListeners, { type = "text_lt", obj = Minimize })
 
-	-- ヘッダー：閉じるボタン
+	-- ヘッダー：閉じるボタン（→ Rayfield風ミニバーに切り替え）
 	local Close = Instance.new("TextButton")
 	Close.Size = UDim2.fromOffset(35, 35)
 	Close.Position = UDim2.new(1, -45, 0, 10)
@@ -261,8 +496,9 @@ function HertaIX:CreateWindow(titleText)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Size = UDim2.new(1, -20, 0, 2)
 	HeaderLine.Position = UDim2.new(0, 10, 0, 50)
-	HeaderLine.BackgroundColor3 = C_CYAN
+	HeaderLine.BackgroundColor3 = C_ACCENT
 	HeaderLine.Parent = Main
+	table.insert(ThemeListeners, { type = "headerline", obj = HeaderLine })
 
 	local HeaderGradient = Instance.new("UIGradient")
 	HeaderGradient.Transparency = NumberSequence.new{
@@ -279,9 +515,10 @@ function HertaIX:CreateWindow(titleText)
 	CenterMark.Size = UDim2.fromOffset(60, 4)
 	CenterMark.AnchorPoint = Vector2.new(0.5, 0)
 	CenterMark.Position = UDim2.new(0.5, 0, 0, 49)
-	CenterMark.BackgroundColor3 = C_CYAN_LIGHT
+	CenterMark.BackgroundColor3 = C_ACCENT_LT
 	CenterMark.ZIndex = 11
 	CenterMark.Parent = Main
+	table.insert(ThemeListeners, { type = "sweep", obj = CenterMark })
 
 	local MarkGradient = Instance.new("UIGradient")
 	MarkGradient.Transparency = NumberSequence.new{
@@ -335,22 +572,16 @@ function HertaIX:CreateWindow(titleText)
 		end
 	end)
 
-	-- 最小化
-	-- AnchorPointを(0.5,0)に切り替えて上端基準で畳む
+	-- 最小化（上端基準で畳む）
 	local FullSize = Main.Size
 	local Minimized = false
 
 	Minimize.MouseButton1Click:Connect(function()
 		Minimized = not Minimized
-
 		if Minimized then
-			-- 現在の中心位置から上端位置を計算してAnchorPointを切り替える
 			local absPos  = Main.AbsolutePosition
 			local absSize = Main.AbsoluteSize
-			local screenH = workspace.CurrentCamera.ViewportSize.Y
-			local screenW = workspace.CurrentCamera.ViewportSize.X
-			-- 上端 Y を画面相対座標に変換
-			local topY = absPos.Y
+			local topY    = absPos.Y
 			local centerX = absPos.X + absSize.X / 2
 			Main.AnchorPoint = Vector2.new(0.5, 0)
 			Main.Position = UDim2.new(0, centerX, 0, topY)
@@ -360,7 +591,6 @@ function HertaIX:CreateWindow(titleText)
 				{ Size = UDim2.new(FullSize.X.Scale, FullSize.X.Offset, 0, 55) }
 			):Play()
 		else
-			-- 展開時：上端位置を保ったまま元のサイズに戻す
 			TweenService:Create(
 				Main,
 				TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -369,10 +599,72 @@ function HertaIX:CreateWindow(titleText)
 		end
 	end)
 
-	-- 閉じる
-	Close.MouseButton1Click:Connect(function()
-		ScreenGui:Destroy()
-	end)
+	-- ============================================================
+	--  Rayfield 風ミニバー（閉じるボタン → 再表示バー）
+	-- ============================================================
+	local MiniBar = Instance.new("TextButton")
+	MiniBar.Size = UDim2.fromOffset(220, 28)
+	MiniBar.AnchorPoint = Vector2.new(0.5, 0)
+	MiniBar.Position = UDim2.new(0.5, 0, 0, -40)  -- 最初は画面外
+	MiniBar.BackgroundColor3 = C_BG
+	MiniBar.BackgroundTransparency = 0.2
+	MiniBar.BorderSizePixel = 0
+	MiniBar.Text = ""
+	MiniBar.ZIndex = 100
+	MiniBar.Parent = ScreenGui
+	table.insert(ThemeListeners, { type = "bg", obj = MiniBar })
+
+	local MBCorner = Instance.new("UICorner")
+	MBCorner.CornerRadius = UDim.new(0, 6)
+	MBCorner.Parent = MiniBar
+
+	local MBStroke = Instance.new("UIStroke")
+	MBStroke.Color = C_ACCENT
+	MBStroke.Thickness = 1
+	MBStroke.Parent = MiniBar
+	table.insert(ThemeListeners, { type = "stroke", obj = MBStroke })
+
+	local MBLabel = Instance.new("TextLabel")
+	MBLabel.Size = UDim2.fromScale(1, 1)
+	MBLabel.BackgroundTransparency = 1
+	MBLabel.Text = "▶  " .. titleText
+	MBLabel.Font = Enum.Font.Code
+	MBLabel.TextSize = 14
+	MBLabel.TextColor3 = C_ACCENT_LT
+	MBLabel.ZIndex = 101
+	MBLabel.Parent = MiniBar
+	table.insert(ThemeListeners, { type = "text_lt", obj = MBLabel })
+
+	local MBAccent = Instance.new("Frame")
+	MBAccent.Size = UDim2.new(1, 0, 0, 2)
+	MBAccent.BorderSizePixel = 0
+	MBAccent.BackgroundColor3 = C_ACCENT
+	MBAccent.ZIndex = 101
+	MBAccent.Parent = MiniBar
+	table.insert(ThemeListeners, { type = "headerline", obj = MBAccent })
+
+	local function ShowMiniBar()
+		Main.Visible = false
+		TweenService:Create(
+			MiniBar,
+			TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			{ Position = UDim2.new(0.5, 0, 0, 6) }
+		):Play()
+	end
+
+	local function HideMiniBar()
+		TweenService:Create(
+			MiniBar,
+			TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ Position = UDim2.new(0.5, 0, 0, -40) }
+		):Play()
+		task.delay(0.22, function()
+			Main.Visible = true
+		end)
+	end
+
+	Close.MouseButton1Click:Connect(ShowMiniBar)
+	MiniBar.MouseButton1Click:Connect(HideMiniBar)
 
 	-- ドラッグ
 	local Dragging = false
@@ -422,7 +714,7 @@ function HertaIX:CreateWindow(titleText)
 			local active = (t == target)
 			t.Page.Visible = active
 			t.Underline.Visible = active
-			t.Button.TextColor3 = active and C_CYAN_LIGHT or C_DARK
+			t.Button.TextColor3 = active and C_ACCENT_LT or C_DARK
 		end
 		Window._ActiveTab = target
 	end
@@ -445,22 +737,24 @@ function HertaIX:CreateWindow(titleText)
 		Btn.TextColor3 = C_DARK
 		Btn.ZIndex = 10
 		Btn.Parent = self._TabBar
+		table.insert(ThemeListeners, { type = "text_dark", obj = Btn })
 
 		local Underline = Instance.new("Frame")
 		Underline.Size = UDim2.new(1, 0, 0, 2)
 		Underline.Position = UDim2.new(0, 0, 1, -2)
 		Underline.BorderSizePixel = 0
-		Underline.BackgroundColor3 = C_CYAN
+		Underline.BackgroundColor3 = C_ACCENT
 		Underline.Visible = false
 		Underline.ZIndex = 10
 		Underline.Parent = Btn
+		table.insert(ThemeListeners, { type = "underline", obj = Underline })
 
 		local Page = Instance.new("ScrollingFrame")
 		Page.Size = UDim2.fromScale(1, 1)
 		Page.BackgroundTransparency = 1
 		Page.BorderSizePixel = 0
 		Page.ScrollBarThickness = 3
-		Page.ScrollBarImageColor3 = C_CYAN
+		Page.ScrollBarImageColor3 = C_ACCENT
 		Page.CanvasSize = UDim2.fromOffset(0, 0)
 		Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		Page.Visible = false
@@ -514,8 +808,7 @@ function HertaIX:CreateWindow(titleText)
 
 			local Enabled = (default == true)
 
-			-- 半透明バック
-			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 36), NextOrder())
+			local Bg = MakeHertaFrame(tabEntry.Page, UDim2.new(1, 0, 0, 36), NextOrder())
 
 			local Toggle = Instance.new("TextButton")
 			Toggle.Size = UDim2.fromScale(1, 1)
@@ -523,7 +816,6 @@ function HertaIX:CreateWindow(titleText)
 			Toggle.Text = ""
 			Toggle.Parent = Bg
 
-			-- 左：ラベル
 			local NameLabel = Instance.new("TextLabel")
 			NameLabel.BackgroundTransparency = 1
 			NameLabel.Size = UDim2.new(0.7, -8, 1, 0)
@@ -532,10 +824,10 @@ function HertaIX:CreateWindow(titleText)
 			NameLabel.Font = Enum.Font.Code
 			NameLabel.TextSize = 17
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			NameLabel.TextColor3 = C_CYAN_LIGHT
+			NameLabel.TextColor3 = C_ACCENT_LT
 			NameLabel.Parent = Toggle
+			table.insert(ThemeListeners, { type = "text_lt", obj = NameLabel })
 
-			-- 右：ON/OFF バッジ
 			local BadgeBg = Instance.new("Frame")
 			BadgeBg.Size = UDim2.fromOffset(52, 22)
 			BadgeBg.AnchorPoint = Vector2.new(1, 0.5)
@@ -544,6 +836,7 @@ function HertaIX:CreateWindow(titleText)
 			BadgeBg.BackgroundTransparency = 0.3
 			BadgeBg.BorderSizePixel = 0
 			BadgeBg.Parent = Toggle
+			table.insert(ThemeListeners, { type = "bg", obj = BadgeBg })
 
 			local BadgeCorner = Instance.new("UICorner")
 			BadgeCorner.CornerRadius = UDim.new(0, 4)
@@ -564,8 +857,8 @@ function HertaIX:CreateWindow(titleText)
 			local function UpdateToggle()
 				if Enabled then
 					StateLabel.Text = "ON"
-					StateLabel.TextColor3 = C_CYAN
-					BadgeStroke.Color = C_CYAN
+					StateLabel.TextColor3 = C_ACCENT
+					BadgeStroke.Color = C_ACCENT
 				else
 					StateLabel.Text = "OFF"
 					StateLabel.TextColor3 = C_DARK
@@ -600,10 +893,8 @@ function HertaIX:CreateWindow(titleText)
 			local Max   = options.Max     or 100
 			local Value = options.Default or Min
 
-			-- 半透明バック（ラベル行 + スライダー行）
-			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 56), NextOrder())
+			local Bg = MakeHertaFrame(tabEntry.Page, UDim2.new(1, 0, 0, 56), NextOrder())
 
-			-- ラベル行
 			local NameLabel = Instance.new("TextLabel")
 			NameLabel.Size = UDim2.new(0.65, 0, 0, 24)
 			NameLabel.Position = UDim2.fromOffset(10, 4)
@@ -612,8 +903,9 @@ function HertaIX:CreateWindow(titleText)
 			NameLabel.Font = Enum.Font.Code
 			NameLabel.TextSize = 16
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			NameLabel.TextColor3 = C_CYAN_LIGHT
+			NameLabel.TextColor3 = C_ACCENT_LT
 			NameLabel.Parent = Bg
+			table.insert(ThemeListeners, { type = "text_lt", obj = NameLabel })
 
 			local ValueLabel = Instance.new("TextLabel")
 			ValueLabel.Size = UDim2.new(0.3, -10, 0, 24)
@@ -621,18 +913,19 @@ function HertaIX:CreateWindow(titleText)
 			ValueLabel.BackgroundTransparency = 1
 			ValueLabel.Font = Enum.Font.Code
 			ValueLabel.TextSize = 16
-			ValueLabel.TextColor3 = C_CYAN
+			ValueLabel.TextColor3 = C_ACCENT
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.Parent = Bg
+			table.insert(ThemeListeners, { type = "text_accent", obj = ValueLabel })
 
-			-- トラック行
 			local TrackBg = Instance.new("Frame")
 			TrackBg.Size = UDim2.new(1, -20, 0, 6)
 			TrackBg.Position = UDim2.new(0, 10, 0, 34)
-			TrackBg.BackgroundColor3 = Color3.fromRGB(20, 60, 60)
+			TrackBg.BackgroundColor3 = C_BG
 			TrackBg.BackgroundTransparency = 0.2
 			TrackBg.BorderSizePixel = 0
 			TrackBg.Parent = Bg
+			table.insert(ThemeListeners, { type = "track", obj = TrackBg })
 
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(1, 0)
@@ -640,9 +933,10 @@ function HertaIX:CreateWindow(titleText)
 
 			local Fill = Instance.new("Frame")
 			Fill.Size = UDim2.new(0, 0, 1, 0)
-			Fill.BackgroundColor3 = C_CYAN
+			Fill.BackgroundColor3 = C_ACCENT
 			Fill.BorderSizePixel = 0
 			Fill.Parent = TrackBg
+			table.insert(ThemeListeners, { type = "fill", obj = Fill })
 
 			local FillCorner = Instance.new("UICorner")
 			FillCorner.CornerRadius = UDim.new(1, 0)
@@ -652,10 +946,11 @@ function HertaIX:CreateWindow(titleText)
 			Knob.Size = UDim2.fromOffset(14, 14)
 			Knob.AnchorPoint = Vector2.new(0.5, 0.5)
 			Knob.Position = UDim2.new(0, 0, 0.5, 0)
-			Knob.BackgroundColor3 = C_CYAN_LIGHT
+			Knob.BackgroundColor3 = C_ACCENT_LT
 			Knob.BorderSizePixel = 0
 			Knob.ZIndex = 2
 			Knob.Parent = TrackBg
+			table.insert(ThemeListeners, { type = "knob", obj = Knob })
 
 			local KnobCorner = Instance.new("UICorner")
 			KnobCorner.CornerRadius = UDim.new(1, 0)
@@ -730,12 +1025,11 @@ function HertaIX:CreateWindow(titleText)
 		-- --------------------------------------------------------
 		--  Tab:AddDropdown(titleText, options, callback)
 		-- --------------------------------------------------------
-		function Tab:AddDropdown(titleText, options, callback)
+		function Tab:AddDropdown(titleText2, options, callback)
 
 			local Selected = nil
 			local Open     = false
 
-			-- 外枠（ClipsDescendants=false でリストが外にはみ出せる）
 			local Container = Instance.new("Frame")
 			Container.Size = UDim2.new(1, 0, 0, 36)
 			Container.BackgroundTransparency = 1
@@ -745,7 +1039,6 @@ function HertaIX:CreateWindow(titleText)
 			Container.ZIndex = 20
 			Container.Parent = tabEntry.Page
 
-			-- メインボタン（半透明バック）
 			local MainButton = Instance.new("TextButton")
 			MainButton.Size = UDim2.new(1, 0, 0, 36)
 			MainButton.BackgroundColor3 = C_BG
@@ -754,16 +1047,24 @@ function HertaIX:CreateWindow(titleText)
 			MainButton.Text = ""
 			MainButton.ZIndex = 20
 			MainButton.Parent = Container
+			table.insert(ThemeListeners, { type = "bg", obj = MainButton })
 
-			local MBCorner = Instance.new("UICorner")
-			MBCorner.CornerRadius = UDim.new(0, 4)
-			MBCorner.Parent = MainButton
+			local MBCorner2 = Instance.new("UICorner")
+			MBCorner2.CornerRadius = UDim.new(0, 4)
+			MBCorner2.Parent = MainButton
 
-			local MBStroke = Instance.new("UIStroke")
-			MBStroke.Color = C_CYAN
-			MBStroke.Thickness = 1
-			MBStroke.Transparency = 0.5
-			MBStroke.Parent = MainButton
+			local MBStroke2 = Instance.new("UIStroke")
+			MBStroke2.Color = C_ACCENT
+			MBStroke2.Thickness = 1
+			MBStroke2.Transparency = 0.5
+			MBStroke2.Parent = MainButton
+			table.insert(ThemeListeners, { type = "stroke", obj = MBStroke2 })
+
+			-- 4隅コーナー
+			MakeCorner(MainButton, 0, 0)
+			MakeCorner(MainButton, 1, 0)
+			MakeCorner(MainButton, 0, 1)
+			MakeCorner(MainButton, 1, 1)
 
 			local Header = Instance.new("TextLabel")
 			Header.Size = UDim2.new(1, -10, 1, 0)
@@ -771,13 +1072,13 @@ function HertaIX:CreateWindow(titleText)
 			Header.BackgroundTransparency = 1
 			Header.Font = Enum.Font.Code
 			Header.TextSize = 16
-			Header.TextColor3 = C_CYAN_LIGHT
+			Header.TextColor3 = C_ACCENT_LT
 			Header.TextXAlignment = Enum.TextXAlignment.Left
-			Header.Text = titleText .. "  ▼"
+			Header.Text = titleText2 .. "  ▼"
 			Header.ZIndex = 21
 			Header.Parent = MainButton
+			table.insert(ThemeListeners, { type = "text_lt", obj = Header })
 
-			-- リストフレーム（展開時に下へ伸びる）
 			local ListFrame = Instance.new("Frame")
 			ListFrame.Size = UDim2.new(1, 0, 0, 0)
 			ListFrame.Position = UDim2.new(0, 0, 1, 2)
@@ -787,25 +1088,27 @@ function HertaIX:CreateWindow(titleText)
 			ListFrame.ClipsDescendants = true
 			ListFrame.ZIndex = 22
 			ListFrame.Parent = Container
+			table.insert(ThemeListeners, { type = "bg", obj = ListFrame })
 
 			local LFCorner = Instance.new("UICorner")
 			LFCorner.CornerRadius = UDim.new(0, 4)
 			LFCorner.Parent = ListFrame
 
 			local LFStroke = Instance.new("UIStroke")
-			LFStroke.Color = C_CYAN
+			LFStroke.Color = C_ACCENT
 			LFStroke.Thickness = 1
 			LFStroke.Transparency = 0.5
 			LFStroke.Parent = ListFrame
+			table.insert(ThemeListeners, { type = "stroke", obj = LFStroke })
 
 			local Layout = Instance.new("UIListLayout")
 			Layout.SortOrder = Enum.SortOrder.LayoutOrder
 			Layout.Parent = ListFrame
 
 			local function UpdateHeader()
-				Header.Text = (Selected and tostring(Selected) or titleText) .. "  ▼"
-				Header.TextColor3 = Selected and C_CYAN or C_CYAN_LIGHT
-				MBStroke.Color = Selected and C_CYAN or C_CYAN
+				Header.Text = (Selected and tostring(Selected) or titleText2) .. "  ▼"
+				Header.TextColor3 = Selected and C_ACCENT or C_ACCENT_LT
+				MBStroke2.Color = C_ACCENT
 			end
 
 			local function RefreshList()
@@ -827,20 +1130,16 @@ function HertaIX:CreateWindow(titleText)
 					Opt.BorderSizePixel = 0
 					Opt.Font = Enum.Font.Code
 					Opt.TextSize = 15
-					Opt.TextColor3 = C_CYAN_LIGHT
+					Opt.TextColor3 = C_ACCENT_LT
 					Opt.TextXAlignment = Enum.TextXAlignment.Left
 					Opt.Text = "  " .. tostring(optName)
 					Opt.LayoutOrder = i
 					Opt.ZIndex = 23
 					Opt.Parent = ListFrame
+					table.insert(ThemeListeners, { type = "text_lt", obj = Opt })
 
-					-- ホバー時に薄く光る
-					Opt.MouseEnter:Connect(function()
-						Opt.TextColor3 = C_CYAN
-					end)
-					Opt.MouseLeave:Connect(function()
-						Opt.TextColor3 = C_CYAN_LIGHT
-					end)
+					Opt.MouseEnter:Connect(function() Opt.TextColor3 = C_ACCENT end)
+					Opt.MouseLeave:Connect(function() Opt.TextColor3 = C_ACCENT_LT end)
 
 					Opt.MouseButton1Click:Connect(function()
 						Selected = optName
@@ -879,7 +1178,7 @@ function HertaIX:CreateWindow(titleText)
 		-- --------------------------------------------------------
 		function Tab:AddLabel(text)
 
-			local Bg = MakeBgFrame(tabEntry.Page, UDim2.new(1, 0, 0, 30), NextOrder())
+			local Bg = MakeHertaFrame(tabEntry.Page, UDim2.new(1, 0, 0, 30), NextOrder())
 
 			local Label = Instance.new("TextLabel")
 			Label.Size = UDim2.new(1, -10, 1, 0)
@@ -888,9 +1187,10 @@ function HertaIX:CreateWindow(titleText)
 			Label.Text = text or ""
 			Label.Font = Enum.Font.Code
 			Label.TextSize = 15
-			Label.TextColor3 = C_CYAN_LIGHT
+			Label.TextColor3 = C_ACCENT_LT
 			Label.TextXAlignment = Enum.TextXAlignment.Left
 			Label.Parent = Bg
+			table.insert(ThemeListeners, { type = "text_lt", obj = Label })
 
 			local obj = {}
 			function obj:Set(v) Label.Text = tostring(v) end
@@ -901,9 +1201,8 @@ function HertaIX:CreateWindow(titleText)
 		-- --------------------------------------------------------
 		--  Tab:AddParagraph(titleText, descText)
 		-- --------------------------------------------------------
-		function Tab:AddParagraph(titleText, descText)
+		function Tab:AddParagraph(pTitle, descText)
 
-			-- 外枠（高さは後で自動調整）
 			local Bg = Instance.new("Frame")
 			Bg.Size = UDim2.new(1, 0, 0, 60)
 			Bg.BackgroundColor3 = C_BG
@@ -911,6 +1210,7 @@ function HertaIX:CreateWindow(titleText)
 			Bg.BorderSizePixel = 0
 			Bg.LayoutOrder = NextOrder()
 			Bg.Parent = tabEntry.Page
+			table.insert(ThemeListeners, { type = "bg", obj = Bg })
 
 			local BgCorner = Instance.new("UICorner")
 			BgCorner.CornerRadius = UDim.new(0, 4)
@@ -919,24 +1219,27 @@ function HertaIX:CreateWindow(titleText)
 			local TopLine = Instance.new("Frame")
 			TopLine.Size = UDim2.new(1, 0, 0, 2)
 			TopLine.BorderSizePixel = 0
-			TopLine.BackgroundColor3 = C_CYAN
+			TopLine.BackgroundColor3 = C_ACCENT
 			TopLine.Parent = Bg
+			table.insert(ThemeListeners, { type = "headerline", obj = TopLine })
 
 			local BottomLine = Instance.new("Frame")
 			BottomLine.BorderSizePixel = 0
-			BottomLine.BackgroundColor3 = C_CYAN
+			BottomLine.BackgroundColor3 = C_ACCENT
 			BottomLine.Parent = Bg
+			table.insert(ThemeListeners, { type = "headerline", obj = BottomLine })
 
 			local TitleLbl = Instance.new("TextLabel")
 			TitleLbl.Size = UDim2.new(1, -10, 0, 22)
 			TitleLbl.Position = UDim2.fromOffset(8, 2)
 			TitleLbl.BackgroundTransparency = 1
-			TitleLbl.Text = titleText or ""
+			TitleLbl.Text = pTitle or ""
 			TitleLbl.Font = Enum.Font.Code
 			TitleLbl.TextSize = 15
 			TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
-			TitleLbl.TextColor3 = C_CYAN_LIGHT
+			TitleLbl.TextColor3 = C_ACCENT_LT
 			TitleLbl.Parent = Bg
+			table.insert(ThemeListeners, { type = "text_lt", obj = TitleLbl })
 
 			local Desc = Instance.new("TextLabel")
 			Desc.Size = UDim2.new(1, -16, 0, 0)
@@ -948,9 +1251,10 @@ function HertaIX:CreateWindow(titleText)
 			Desc.TextXAlignment = Enum.TextXAlignment.Left
 			Desc.Font = Enum.Font.Code
 			Desc.TextSize = 13
-			Desc.TextColor3 = C_CYAN_MID
+			Desc.TextColor3 = C_ACCENT_MID
 			Desc.Text = descText or ""
 			Desc.Parent = Bg
+			table.insert(ThemeListeners, { type = "text_mid", obj = Desc })
 
 			local function UpdateSize()
 				local H = 30 + Desc.TextBounds.Y + 10
@@ -988,22 +1292,24 @@ function HertaIX:CreateWindow(titleText)
 		Notification.BackgroundTransparency = 0.35
 		Notification.BorderSizePixel = 0
 		Notification.Parent = self._ScreenGui
+		table.insert(ThemeListeners, { type = "bg", obj = Notification })
 
 		local NCorner = Instance.new("UICorner")
 		NCorner.CornerRadius = UDim.new(0, 6)
 		NCorner.Parent = Notification
 
 		local NStroke = Instance.new("UIStroke")
-		NStroke.Color = C_CYAN
+		NStroke.Color = C_ACCENT
 		NStroke.Thickness = 1
 		NStroke.Parent = Notification
+		table.insert(ThemeListeners, { type = "stroke", obj = NStroke })
 
-		-- タイトル上部アクセントライン
 		local AccentLine = Instance.new("Frame")
 		AccentLine.Size = UDim2.new(1, 0, 0, 2)
 		AccentLine.BorderSizePixel = 0
-		AccentLine.BackgroundColor3 = C_CYAN
+		AccentLine.BackgroundColor3 = C_ACCENT
 		AccentLine.Parent = Notification
+		table.insert(ThemeListeners, { type = "headerline", obj = AccentLine })
 
 		local TitleLbl = Instance.new("TextLabel")
 		TitleLbl.Size = UDim2.new(1, -10, 0, 26)
@@ -1013,8 +1319,9 @@ function HertaIX:CreateWindow(titleText)
 		TitleLbl.Font = Enum.Font.Code
 		TitleLbl.TextSize = 17
 		TitleLbl.TextXAlignment = Enum.TextXAlignment.Left
-		TitleLbl.TextColor3 = C_CYAN_LIGHT
+		TitleLbl.TextColor3 = C_ACCENT_LT
 		TitleLbl.Parent = Notification
+		table.insert(ThemeListeners, { type = "text_lt", obj = TitleLbl })
 
 		local MsgLbl = Instance.new("TextLabel")
 		MsgLbl.Size = UDim2.new(1, -10, 0, 36)
@@ -1025,8 +1332,9 @@ function HertaIX:CreateWindow(titleText)
 		MsgLbl.TextSize = 13
 		MsgLbl.TextXAlignment = Enum.TextXAlignment.Left
 		MsgLbl.TextWrapped = true
-		MsgLbl.TextColor3 = C_CYAN_MID
+		MsgLbl.TextColor3 = C_ACCENT_MID
 		MsgLbl.Parent = Notification
+		table.insert(ThemeListeners, { type = "text_mid", obj = MsgLbl })
 
 		TweenService:Create(
 			Notification,
@@ -1045,6 +1353,75 @@ function HertaIX:CreateWindow(titleText)
 			if Notification then Notification:Destroy() end
 		end)
 	end
+
+	-- ----------------------------------------------------------
+	--  CONFIG タブ（自動生成）
+	-- ----------------------------------------------------------
+	local ConfigTab = Window:CreateTab("CONFIG")
+
+	local ThemeOrder = {
+		"near_future", "gameboy", "rainbow_B", "rainbow_W",
+		"monotone", "undertale", "leaf", "herta", "king"
+	}
+	local ThemeLabels = {
+		near_future = "NEAR FUTURE",
+		gameboy     = "GAMEBOY",
+		rainbow_B   = "RAINBOW B",
+		rainbow_W   = "RAINBOW W",
+		monotone    = "MONOTONE",
+		undertale   = "UNDERTALE",
+		leaf        = "LEAF",
+		herta       = "HERTA",
+		king        = "KING",
+	}
+
+	local CurrentTheme = "near_future"
+	local ThemeButtons = {}
+
+	local function UpdateThemeButtons()
+		for name, btn in pairs(ThemeButtons) do
+			if name == CurrentTheme then
+				btn.BackgroundTransparency = 0.2
+				btn.TextColor3 = C_ACCENT
+			else
+				btn.BackgroundTransparency = 0.7
+				btn.TextColor3 = C_DARK
+			end
+		end
+	end
+
+	ConfigTab:AddParagraph("COLOR THEME", "テーマを選択してGUIの配色を変更します。")
+
+	for _, name in ipairs(ThemeOrder) do
+		local Bg = MakeHertaFrame(
+			ConfigTab._Entry.Page,
+			UDim2.new(1, 0, 0, 34),
+			ConfigTab._Entry._Order + 1
+		)
+		ConfigTab._Entry._Order = ConfigTab._Entry._Order + 1
+
+		local Btn = Instance.new("TextButton")
+		Btn.Size = UDim2.fromScale(1, 1)
+		Btn.BackgroundColor3 = C_BG
+		Btn.BackgroundTransparency = 0.7
+		Btn.BorderSizePixel = 0
+		Btn.Font = Enum.Font.Code
+		Btn.TextSize = 16
+		Btn.Text = ThemeLabels[name]
+		Btn.TextColor3 = C_DARK
+		Btn.Parent = Bg
+		table.insert(ThemeListeners, { type = "bg", obj = Btn })
+
+		ThemeButtons[name] = Btn
+
+		Btn.MouseButton1Click:Connect(function()
+			CurrentTheme = name
+			ApplyTheme(name)
+			UpdateThemeButtons()
+		end)
+	end
+
+	UpdateThemeButtons()
 
 	return Window
 end

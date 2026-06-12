@@ -1318,10 +1318,19 @@ function HertaIX:CreateWindow(titleText, theme)
 				end
 			end
 
-			MainButton.MouseButton1Click:Connect(function()
-				Open = not Open
-				RefreshList()
-			end)
+				-- 開いている間、毎フレームMainButtonの位置に追従させる
+				RunService.RenderStepped:Connect(function()
+					if Open and ListFrame.Visible then
+						local abs = MainButton.AbsolutePosition
+						local absSize = MainButton.AbsoluteSize
+						ListFrame.Position = UDim2.fromOffset(abs.X, abs.Y + absSize.Y + 2)
+					end
+				end)
+
+				MainButton.MouseButton1Click:Connect(function()
+					Open = not Open
+					RefreshList()
+				end)
 
 			BuildOptions()
 			UpdateHeader()

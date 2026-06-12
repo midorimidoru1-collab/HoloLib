@@ -695,6 +695,22 @@ function HertaIX:CreateWindow(titleText, theme)
 	MBLabel.Parent = MiniBar
 	table.insert(ThemeListeners, { type = "text_lt", obj = MBLabel })
 
+	-- ミニバー：右側薄いサブテキスト
+	local MBSub = Instance.new("TextLabel")
+	MBSub.Size = UDim2.fromOffset(110, 28)
+	MBSub.AnchorPoint = Vector2.new(1, 0.5)
+	MBSub.Position = UDim2.new(1, -8, 0.5, 0)
+	MBSub.BackgroundTransparency = 1
+	MBSub.Text = "by HertaIX Lib"
+	MBSub.Font = Enum.Font.Code
+	MBSub.TextSize = 11
+	MBSub.TextColor3 = C_ACCENT_LT
+	MBSub.TextTransparency = 0.55
+	MBSub.TextXAlignment = Enum.TextXAlignment.Right
+	MBSub.ZIndex = 101
+	MBSub.Parent = MiniBar
+	table.insert(ThemeListeners, { type = "text_lt", obj = MBSub })
+
 	local MBAccent = Instance.new("Frame")
 	MBAccent.Size = UDim2.new(1, 0, 0, 2)
 	MBAccent.BorderSizePixel = 0

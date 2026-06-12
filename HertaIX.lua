@@ -705,20 +705,23 @@ function HertaIX:CreateWindow(titleText, theme)
 
 	local function ShowMiniBar()
 		Main.Visible = false
+		-- GuiInset（システムバー分）を考慮して画面最上端に配置
+		local inset = game:GetService("GuiService"):GetGuiInset()
+		MiniBar.Position = UDim2.new(0.5, 0, 0, -80)
 		TweenService:Create(
 			MiniBar,
-			TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-			{ Position = UDim2.new(0.5, 0, 0, 6) }
+			TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ Position = UDim2.new(0.5, 0, 0, -inset.Y) }
 		):Play()
 	end
 
 	local function HideMiniBar()
 		TweenService:Create(
 			MiniBar,
-			TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-			{ Position = UDim2.new(0.5, 0, 0, -40) }
+			TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ Position = UDim2.new(0.5, 0, 0, -80) }
 		):Play()
-		task.delay(0.22, function()
+		task.delay(0.2, function()
 			Main.Visible = true
 		end)
 	end

@@ -960,10 +960,66 @@ function HertaIX:CreateWindow(titleText, theme)
 			return tabEntry._Order
 		end
 
-		-- --------------------------------------------------------
-		--  Tab:AddToggle(labelText, default, callback)
-		-- --------------------------------------------------------
-		function Tab:AddToggle(labelText, default, callback)
+			-- --------------------------------------------------------
+			--  Tab:AddButton(labelText, callback)
+			-- --------------------------------------------------------
+			function Tab:AddButton(labelText, callback)
+
+				local Bg = MakeHertaFrame(tabEntry.Page, UDim2.new(1, 0, 0, 36), NextOrder())
+
+				local Btn = Instance.new("TextButton")
+				Btn.Size = UDim2.fromScale(1, 1)
+				Btn.BackgroundTransparency = 1
+				Btn.Text = ""
+				Btn.Parent = Bg
+
+				local NameLabel = Instance.new("TextLabel")
+				NameLabel.BackgroundTransparency = 1
+				NameLabel.Size = UDim2.new(1, -20, 1, 0)
+				NameLabel.Position = UDim2.fromOffset(10, 0)
+				NameLabel.Text = labelText
+				NameLabel.Font = Enum.Font.Code
+				NameLabel.TextSize = 17
+				NameLabel.TextXAlignment = Enum.TextXAlignment.Center
+				NameLabel.TextColor3 = C_ACCENT_LT
+				NameLabel.Parent = Btn
+				table.insert(ThemeListeners, { type = "text_lt", obj = NameLabel })
+
+				-- ホバー時に明るくするエフェクト
+				local HoverLine = Instance.new("Frame")
+				HoverLine.Size = UDim2.new(0, 0, 0, 1)
+				HoverLine.Position = UDim2.new(0.5, 0, 1, -1)
+				HoverLine.AnchorPoint = Vector2.new(0.5, 0)
+				HoverLine.BackgroundColor3 = C_ACCENT
+				HoverLine.BorderSizePixel = 0
+				HoverLine.ZIndex = 12
+				HoverLine.Parent = Bg
+				table.insert(ThemeListeners, { type = "accent", obj = HoverLine })
+
+				Btn.MouseEnter:Connect(function()
+					TweenService:Create(HoverLine, TweenInfo.new(0.15), { Size = UDim2.new(0.8, 0, 0, 1) }):Play()
+					TweenService:Create(NameLabel, TweenInfo.new(0.15), { TextColor3 = C_ACCENT }):Play()
+				end)
+				Btn.MouseLeave:Connect(function()
+					TweenService:Create(HoverLine, TweenInfo.new(0.15), { Size = UDim2.new(0, 0, 0, 1) }):Play()
+					TweenService:Create(NameLabel, TweenInfo.new(0.15), { TextColor3 = C_ACCENT_LT }):Play()
+				end)
+
+				Btn.MouseButton1Click:Connect(function()
+					if callback then callback() end
+				end)
+
+				local obj = {}
+				function obj:SetLabel(text)
+					NameLabel.Text = text
+				end
+				return obj
+			end
+
+			-- --------------------------------------------------------
+			--  Tab:AddToggle(labelText, default, callback)
+			-- --------------------------------------------------------
+			function Tab:AddToggle(labelText, default, callback)
 
 			local Enabled = (default == true)
 

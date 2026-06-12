@@ -611,7 +611,8 @@ function HertaIX:CreateWindow(titleText, theme)
 
 	RunService.RenderStepped:Connect(function()
 		if TitleLabel.Parent then
-			Cursor.Position = UDim2.fromOffset(15 + TitleLabel.TextBounds.X, 10)
+			-- TitleLabel の開始X(54px) + 実際のテキスト幅
+			Cursor.Position = UDim2.fromOffset(54 + TitleLabel.TextBounds.X, 10)
 		end
 	end)
 

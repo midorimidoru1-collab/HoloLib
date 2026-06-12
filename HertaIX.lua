@@ -366,7 +366,7 @@ function HertaIX:CreateWindow(titleText, theme)
 	Main.BackgroundColor3 = C_ACCENT
 	Main.BackgroundTransparency = 0.93
 	Main.BorderSizePixel = 0
-	Main.ClipsDescendants = true
+	Main.ClipsDescendants = false
 	Main.Parent = ScreenGui
 	table.insert(ThemeListeners, { type = "mainbg", obj = Main })
 
@@ -1230,16 +1230,16 @@ function HertaIX:CreateWindow(titleText, theme)
 				Header.Parent = MainButton
 				table.insert(ThemeListeners, { type = "text_lt", obj = Header })
 
-				-- ListFrameはScreenGuiの子として配置し、他要素を押し下げず重ねて表示
-				local ListFrame = Instance.new("Frame")
-				ListFrame.Size = UDim2.fromOffset(0, 0)
-				ListFrame.BackgroundColor3 = C_BG
-				ListFrame.BackgroundTransparency = 0.3
-				ListFrame.BorderSizePixel = 0
-				ListFrame.ClipsDescendants = true
-				ListFrame.ZIndex = 50
-				ListFrame.Visible = false
-				ListFrame.Parent = ScreenGui
+					-- ListFrameはMainの子として配置し、ZIndexで前面に重ねる
+					local ListFrame = Instance.new("Frame")
+					ListFrame.Size = UDim2.fromOffset(0, 0)
+					ListFrame.BackgroundColor3 = C_BG
+					ListFrame.BackgroundTransparency = 0.3
+					ListFrame.BorderSizePixel = 0
+					ListFrame.ClipsDescendants = true
+					ListFrame.ZIndex = 50
+					ListFrame.Visible = false
+					ListFrame.Parent = Main
 				table.insert(ThemeListeners, { type = "bg", obj = ListFrame })
 
 				local LFCorner = Instance.new("UICorner")
@@ -1263,28 +1263,31 @@ function HertaIX:CreateWindow(titleText, theme)
 					MBStroke2.Color = C_ACCENT
 				end
 
-				local function RefreshList()
-					local listH = Open and #options * 28 or 0
-					if Open then
-						-- MainButtonのAbsolutePositionを基にリストをボタン直下に配置
-						local abs = MainButton.AbsolutePosition
-						local absSize = MainButton.AbsoluteSize
-						ListFrame.Position = UDim2.fromOffset(abs.X, abs.Y + absSize.Y + 2)
-						ListFrame.Size = UDim2.fromOffset(absSize.X, 0)
-						ListFrame.Visible = true
+					local function RefreshList()
+						local listH = Open and #options * 28 or 0
+						if Open then
+							-- Main相対座標でボタン直下に配置
+							local mainAbs = Main.AbsolutePosition
+							local btnAbs  = MainButton.AbsolutePosition
+							local btnSize = MainButton.AbsoluteSize
+							local relX = btnAbs.X - mainAbs.X
+							local relY = btnAbs.Y - mainAbs.Y + btnSize.Y + 2
+							ListFrame.Position = UDim2.fromOffset(relX, relY)
+							ListFrame.Size = UDim2.fromOffset(btnSize.X, 0)
+							ListFrame.Visible = true
+						end
+						TweenService:Create(
+							ListFrame,
+							TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+							{ Size = UDim2.fromOffset(
+								MainButton.AbsoluteSize.X,
+								listH
+							)}
+						):Play()
+						if not Open then
+							task.delay(0.19, function() ListFrame.Visible = false end)
+						end
 					end
-					TweenService:Create(
-						ListFrame,
-						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
-						{ Size = UDim2.fromOffset(
-							MainButton.AbsoluteSize.X,
-							listH
-						)}
-					):Play()
-					if not Open then
-						task.delay(0.19, function() ListFrame.Visible = false end)
-					end
-				end
 
 			local function BuildOptions()
 				for _, child in ipairs(ListFrame:GetChildren()) do
@@ -1318,14 +1321,7 @@ function HertaIX:CreateWindow(titleText, theme)
 				end
 			end
 
-				-- 開いている間、毎フレームMainButtonの位置に追従させる
-				RunService.RenderStepped:Connect(function()
-					if Open and ListFrame.Visible then
-						local abs = MainButton.AbsolutePosition
-						local absSize = MainButton.AbsoluteSize
-						ListFrame.Position = UDim2.fromOffset(abs.X, abs.Y + absSize.Y + 2)
-					end
-				end)
+					-- Mainの子なのでドラッグ時も自動追従。RenderStepped不要
 
 				MainButton.MouseButton1Click:Connect(function()
 					Open = not Open

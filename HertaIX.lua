@@ -667,13 +667,29 @@ function HertaIX:CreateWindow(titleText, theme)
 	MBStroke.Parent = MiniBar
 	table.insert(ThemeListeners, { type = "stroke", obj = MBStroke })
 
+	-- ミニバー：アイコン
+	local MBIcon = Instance.new("ImageLabel")
+	MBIcon.Size = UDim2.fromOffset(20, 20)
+	MBIcon.AnchorPoint = Vector2.new(0, 0.5)
+	MBIcon.Position = UDim2.fromOffset(8, 14)
+	MBIcon.BackgroundTransparency = 1
+	MBIcon.BorderSizePixel = 0
+	MBIcon.ZIndex = 101
+	MBIcon.Parent = MiniBar
+	if _IconAssetId then
+		MBIcon.Image = _IconAssetId
+	end
+
+	-- ミニバー：タイトルテキスト
 	local MBLabel = Instance.new("TextLabel")
-	MBLabel.Size = UDim2.fromScale(1, 1)
+	MBLabel.Size = UDim2.new(1, -36, 1, 0)
+	MBLabel.Position = UDim2.fromOffset(32, 0)
 	MBLabel.BackgroundTransparency = 1
-	MBLabel.Text = "▶  " .. titleText
+	MBLabel.Text = titleText
 	MBLabel.Font = Enum.Font.Code
 	MBLabel.TextSize = 14
 	MBLabel.TextColor3 = C_ACCENT_LT
+	MBLabel.TextXAlignment = Enum.TextXAlignment.Left
 	MBLabel.ZIndex = 101
 	MBLabel.Parent = MiniBar
 	table.insert(ThemeListeners, { type = "text_lt", obj = MBLabel })

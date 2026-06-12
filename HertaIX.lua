@@ -465,6 +465,19 @@ function HertaIX:CreateWindow(titleText)
 	Cursor.Parent = Main
 	table.insert(ThemeListeners, { type = "text_main", obj = Cursor })
 
+	-- ヘッダー：設定ボタン（⚙ テーマドロップダウン）
+	local ConfigBtn = Instance.new("TextButton")
+	ConfigBtn.Size = UDim2.fromOffset(35, 35)
+	ConfigBtn.Position = UDim2.new(1, -125, 0, 10)
+	ConfigBtn.BackgroundTransparency = 1
+	ConfigBtn.Text = "⚙"
+	ConfigBtn.Font = Enum.Font.Code
+	ConfigBtn.TextSize = 22
+	ConfigBtn.TextColor3 = C_ACCENT_LT
+	ConfigBtn.ZIndex = 10
+	ConfigBtn.Parent = Main
+	table.insert(ThemeListeners, { type = "text_lt", obj = ConfigBtn })
+
 	-- ヘッダー：最小化ボタン
 	local Minimize = Instance.new("TextButton")
 	Minimize.Size = UDim2.fromOffset(35, 35)

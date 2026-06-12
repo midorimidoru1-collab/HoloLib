@@ -1355,23 +1355,10 @@ function HertaIX:CreateWindow(titleText)
 	end
 
 	-- ----------------------------------------------------------
-	--  CONFIG タブ（自動生成）
-	--  Window:CreateTab() を上書きして、CONFIG は常に最後尾に再配置する
+	--  ⚙ テーマドロップダウンパネル（設定ボタンから開閉）
 	-- ----------------------------------------------------------
-
-	-- CONFIG タブを生成し、ユーザーが CreateTab を呼ぶたびに末尾へ再配置する
-	local _OrigCreateTab = Window.CreateTab
-	local ConfigTab = _OrigCreateTab(Window, "CONFIG")
-	local _ConfigEntry = ConfigTab._Entry
-
-	function Window:CreateTab(name)
-		-- 新しいタブを追加する前に CONFIG ボタンを一時退避
-		local tab = _OrigCreateTab(self, name)
-		-- 新タブが追加された後、CONFIG ボタンを現在の末尾へ移動
-		_ConfigEntry.Button.Position = UDim2.fromOffset(self._TabOffset - (90 + 8), 0)
-		return tab
-	end
-
+	local ITEM_H    = 30
+	local PANEL_PAD = 4
 	local ThemeOrder = {
 		"near_future", "gameboy", "rainbow_B", "rainbow_W",
 		"monotone", "undertale", "leaf", "herta", "king"
@@ -1387,54 +1374,96 @@ function HertaIX:CreateWindow(titleText)
 		herta       = "HERTA",
 		king        = "KING",
 	}
+	local PANEL_H = #ThemeOrder * ITEM_H + PANEL_PAD * 2
+
+	-- パネル本体（Main の右上に重ねる）
+	local ThemePanel = Instance.new("Frame")
+	ThemePanel.Name = "ThemePanel"
+	ThemePanel.Size = UDim2.fromOffset(160, PANEL_H)
+	ThemePanel.AnchorPoint = Vector2.new(1, 0)
+	ThemePanel.Position = UDim2.new(1, 0, 1, 4)
+	ThemePanel.BackgroundColor3 = C_BG
+	ThemePanel.BackgroundTransparency = 0.15
+	ThemePanel.BorderSizePixel = 0
+	ThemePanel.ZIndex = 50
+	ThemePanel.Visible = false
+	ThemePanel.ClipsDescendants = false
+	ThemePanel.Parent = Main
+	table.insert(ThemeListeners, { type = "bg", obj = ThemePanel })
+
+	local TPCorner = Instance.new("UICorner")
+	TPCorner.CornerRadius = UDim.new(0, 6)
+	TPCorner.Parent = ThemePanel
+
+	local TPStroke = Instance.new("UIStroke")
+	TPStroke.Color = C_ACCENT
+	TPStroke.Transparency = 0.4
+	TPStroke.Parent = ThemePanel
+	table.insert(ThemeListeners, { type = "stroke", obj = TPStroke })
 
 	local CurrentTheme = "near_future"
-	local ThemeButtons = {}
+	local ThemeItemBtns = {}
 
-	local function UpdateThemeButtons()
-		for name, btn in pairs(ThemeButtons) do
+	local function UpdateThemeItems()
+		for name, btn in pairs(ThemeItemBtns) do
 			if name == CurrentTheme then
-				btn.BackgroundTransparency = 0.2
 				btn.TextColor3 = C_ACCENT
+				btn.BackgroundTransparency = 0.6
 			else
-				btn.BackgroundTransparency = 0.7
-				btn.TextColor3 = C_DARK
+				btn.TextColor3 = C_TEXT
+				btn.BackgroundTransparency = 1
 			end
 		end
 	end
 
-	ConfigTab:AddParagraph("COLOR THEME", "テーマを選択してGUIの配色を変更します。")
+	for i, name in ipairs(ThemeOrder) do
+		local Item = Instance.new("TextButton")
+		Item.Size = UDim2.new(1, -PANEL_PAD*2, 0, ITEM_H)
+		Item.Position = UDim2.fromOffset(PANEL_PAD, PANEL_PAD + (i-1)*ITEM_H)
+		Item.BackgroundColor3 = C_ACCENT
+		Item.BackgroundTransparency = 1
+		Item.BorderSizePixel = 0
+		Item.Font = Enum.Font.Code
+		Item.TextSize = 15
+		Item.Text = ThemeLabels[name]
+		Item.TextColor3 = C_TEXT
+		Item.TextXAlignment = Enum.TextXAlignment.Left
+		Item.ZIndex = 51
+		Item.Parent = ThemePanel
+		table.insert(ThemeListeners, { type = "text_main", obj = Item })
 
-	for _, name in ipairs(ThemeOrder) do
-		local Bg = MakeHertaFrame(
-			ConfigTab._Entry.Page,
-			UDim2.new(1, 0, 0, 34),
-			ConfigTab._Entry._Order + 1
-		)
-		ConfigTab._Entry._Order = ConfigTab._Entry._Order + 1
+		if i < #ThemeOrder then
+			local Divider = Instance.new("Frame")
+			Divider.Size = UDim2.new(1, -PANEL_PAD*2, 0, 1)
+			Divider.Position = UDim2.fromOffset(PANEL_PAD, PANEL_PAD + i*ITEM_H - 1)
+			Divider.BackgroundColor3 = C_ACCENT
+			Divider.BackgroundTransparency = 0.7
+			Divider.BorderSizePixel = 0
+			Divider.ZIndex = 51
+			Divider.Parent = ThemePanel
+			table.insert(ThemeListeners, { type = "accent", obj = Divider })
+		end
 
-		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.fromScale(1, 1)
-		Btn.BackgroundColor3 = C_BG
-		Btn.BackgroundTransparency = 0.7
-		Btn.BorderSizePixel = 0
-		Btn.Font = Enum.Font.Code
-		Btn.TextSize = 16
-		Btn.Text = ThemeLabels[name]
-		Btn.TextColor3 = C_DARK
-		Btn.Parent = Bg
-		table.insert(ThemeListeners, { type = "bg", obj = Btn })
+		ThemeItemBtns[name] = Item
 
-		ThemeButtons[name] = Btn
-
-		Btn.MouseButton1Click:Connect(function()
+		Item.MouseButton1Click:Connect(function()
 			CurrentTheme = name
 			ApplyTheme(name)
-			UpdateThemeButtons()
+			UpdateThemeItems()
+			ThemePanel.Visible = false
+			PanelOpen = false
 		end)
 	end
 
-	UpdateThemeButtons()
+	UpdateThemeItems()
+
+	-- ⚙ ボタン：クリックでパネル開閉
+	local PanelOpen = false
+	ConfigBtn.MouseButton1Click:Connect(function()
+		PanelOpen = not PanelOpen
+		ThemePanel.Visible = PanelOpen
+		if PanelOpen then UpdateThemeItems() end
+	end)
 
 	return Window
 end

@@ -471,8 +471,8 @@ function HertaIX:CreateWindow(titleText, theme)
 
 	-- ヘッダー：タイトル
 	local TitleLabel = Instance.new("TextLabel")
-	TitleLabel.Size = UDim2.new(1, -120, 0, 40)
-	TitleLabel.Position = UDim2.fromOffset(15, 10)
+	TitleLabel.Size = UDim2.new(1, -170, 0, 40)
+	TitleLabel.Position = UDim2.fromOffset(54, 10)
 	TitleLabel.BackgroundTransparency = 1
 	TitleLabel.Text = ""
 	TitleLabel.Font = Enum.Font.Code
@@ -483,11 +483,11 @@ function HertaIX:CreateWindow(titleText, theme)
 	TitleLabel.Parent = Main
 	table.insert(ThemeListeners, { type = "text_main", obj = TitleLabel })
 
-	-- タイトル右端アイコン
+	-- タイトル左側アイコン
 	local HeaderIcon = Instance.new("ImageLabel")
-	HeaderIcon.Size = UDim2.fromOffset(38, 38)
-	HeaderIcon.AnchorPoint = Vector2.new(1, 0.5)
-	HeaderIcon.Position = UDim2.new(1, -170, 0, 25)
+	HeaderIcon.Size = UDim2.fromOffset(36, 36)
+	HeaderIcon.AnchorPoint = Vector2.new(0, 0.5)
+	HeaderIcon.Position = UDim2.fromOffset(12, 25)
 	HeaderIcon.BackgroundTransparency = 1
 	HeaderIcon.BorderSizePixel = 0
 	HeaderIcon.ZIndex = 10

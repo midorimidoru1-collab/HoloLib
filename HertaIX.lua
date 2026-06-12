@@ -181,6 +181,9 @@ local function ApplyTheme(name)
 
 		if entry.type == "stroke" then
 			obj.Color = C_ACCENT
+		elseif entry.type == "stroke_faint" then
+			obj.Color = C_ACCENT
+			obj.Transparency = 0.7
 		elseif entry.type == "corner_h" or entry.type == "corner_v" then
 			obj.BackgroundColor3 = C_ACCENT
 		elseif entry.type == "bg" then
@@ -825,7 +828,9 @@ function HertaIX:CreateWindow(titleText, theme)
 		local Btn = Instance.new("TextButton")
 		Btn.Size = UDim2.fromOffset(TAB_W, TAB_H)
 		Btn.Position = UDim2.fromOffset(self._TabOffset, 0)
-		Btn.BackgroundTransparency = 1
+		Btn.BackgroundColor3 = Color3.fromRGB(4, 18, 22)
+		Btn.BackgroundTransparency = 0.45
+		Btn.BorderSizePixel = 0
 		Btn.Text = name
 		Btn.Font = Enum.Font.Code
 		Btn.TextSize = 16
@@ -833,6 +838,17 @@ function HertaIX:CreateWindow(titleText, theme)
 		Btn.ZIndex = 10
 		Btn.Parent = self._TabBar
 		table.insert(ThemeListeners, { type = "text_dark", obj = Btn })
+
+		local BtnCorner = Instance.new("UICorner")
+		BtnCorner.CornerRadius = UDim.new(0, 4)
+		BtnCorner.Parent = Btn
+
+		local BtnStroke = Instance.new("UIStroke")
+		BtnStroke.Color = C_ACCENT
+		BtnStroke.Thickness = 1
+		BtnStroke.Transparency = 0.7
+		BtnStroke.Parent = Btn
+		table.insert(ThemeListeners, { type = "stroke_faint", obj = BtnStroke })
 
 		local Underline = Instance.new("Frame")
 		Underline.Size = UDim2.new(1, 0, 0, 2)

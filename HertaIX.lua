@@ -825,30 +825,49 @@ function HertaIX:CreateWindow(titleText, theme)
 		local TAB_W = 90
 		local TAB_H = 28
 
+		-- タブボタン：TextButton（透明・クリック受付け用）
 		local Btn = Instance.new("TextButton")
 		Btn.Size = UDim2.fromOffset(TAB_W, TAB_H)
 		Btn.Position = UDim2.fromOffset(self._TabOffset, 0)
-		Btn.BackgroundColor3 = Color3.fromRGB(4, 18, 22)
-		Btn.BackgroundTransparency = 0.45
+		Btn.BackgroundTransparency = 1
 		Btn.BorderSizePixel = 0
-		Btn.Text = name
-		Btn.Font = Enum.Font.Code
-		Btn.TextSize = 16
-		Btn.TextColor3 = C_DARK
+		Btn.Text = ""
 		Btn.ZIndex = 10
 		Btn.Parent = self._TabBar
-		table.insert(ThemeListeners, { type = "text_dark", obj = Btn })
 
-		local BtnCorner = Instance.new("UICorner")
-		BtnCorner.CornerRadius = UDim.new(0, 4)
-		BtnCorner.Parent = Btn
+		-- タブボタン：暗い半透明背景（MakeHertaFrameと同じデザイン・ UICornerなし）
+		local BtnBg = Instance.new("Frame")
+		BtnBg.Size = UDim2.fromScale(1, 1)
+		BtnBg.BackgroundColor3 = C_BG
+		BtnBg.BackgroundTransparency = 0.45
+		BtnBg.BorderSizePixel = 0
+		BtnBg.ZIndex = 9
+		BtnBg.Parent = Btn
+		table.insert(ThemeListeners, { type = "bg", obj = BtnBg })
 
 		local BtnStroke = Instance.new("UIStroke")
 		BtnStroke.Color = C_ACCENT
 		BtnStroke.Thickness = 1
-		BtnStroke.Transparency = 0.7
-		BtnStroke.Parent = Btn
-		table.insert(ThemeListeners, { type = "stroke_faint", obj = BtnStroke })
+		BtnStroke.Transparency = 0.5
+		BtnStroke.Parent = BtnBg
+		table.insert(ThemeListeners, { type = "stroke", obj = BtnStroke })
+
+		MakeCorner(BtnBg, 0, 0)
+		MakeCorner(BtnBg, 1, 0)
+		MakeCorner(BtnBg, 0, 1)
+		MakeCorner(BtnBg, 1, 1)
+
+		-- タブボタン：テキストラベル（TextButtonのテキストと二重にならないよう分離）
+		local BtnLabel = Instance.new("TextLabel")
+		BtnLabel.Size = UDim2.fromScale(1, 1)
+		BtnLabel.BackgroundTransparency = 1
+		BtnLabel.Text = name
+		BtnLabel.Font = Enum.Font.Code
+		BtnLabel.TextSize = 16
+		BtnLabel.TextColor3 = C_DARK
+		BtnLabel.ZIndex = 11
+		BtnLabel.Parent = Btn
+		table.insert(ThemeListeners, { type = "text_dark", obj = BtnLabel })
 
 		local Underline = Instance.new("Frame")
 		Underline.Size = UDim2.new(1, 0, 0, 2)

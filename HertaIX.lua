@@ -521,6 +521,22 @@ function HertaIX:CreateWindow(titleText, theme)
 	Minimize.Parent = Main
 	table.insert(ThemeListeners, { type = "text_lt", obj = Minimize })
 
+	-- 最小化ボタンの少し右に薄く by HertaIX Lib
+	local ByLabel = Instance.new("TextLabel")
+	ByLabel.Size = UDim2.fromOffset(130, 20)
+	ByLabel.AnchorPoint = Vector2.new(0, 0.5)
+	ByLabel.Position = UDim2.new(1, -78, 0, 43)
+	ByLabel.BackgroundTransparency = 1
+	ByLabel.Text = "by HertaIX Lib"
+	ByLabel.Font = Enum.Font.Code
+	ByLabel.TextSize = 11
+	ByLabel.TextColor3 = C_ACCENT_LT
+	ByLabel.TextTransparency = 0.6
+	ByLabel.TextXAlignment = Enum.TextXAlignment.Left
+	ByLabel.ZIndex = 10
+	ByLabel.Parent = Main
+	table.insert(ThemeListeners, { type = "text_lt", obj = ByLabel })
+
 	-- ヘッダー：閉じるボタン（→ Rayfield風ミニバーに切り替え）
 	local Close = Instance.new("TextButton")
 	Close.Size = UDim2.fromOffset(35, 35)
@@ -681,12 +697,12 @@ function HertaIX:CreateWindow(titleText, theme)
 		MBIcon.Image = _IconAssetId
 	end
 
-	-- ミニバー：タイトルテキスト
+	-- ミニバー：タイトルテキスト（HertaIX 固定・左揃え）
 	local MBLabel = Instance.new("TextLabel")
 	MBLabel.Size = UDim2.new(1, -36, 1, 0)
 	MBLabel.Position = UDim2.fromOffset(32, 0)
 	MBLabel.BackgroundTransparency = 1
-	MBLabel.Text = titleText
+	MBLabel.Text = "HertaIX"
 	MBLabel.Font = Enum.Font.Code
 	MBLabel.TextSize = 14
 	MBLabel.TextColor3 = C_ACCENT_LT
@@ -694,22 +710,6 @@ function HertaIX:CreateWindow(titleText, theme)
 	MBLabel.ZIndex = 101
 	MBLabel.Parent = MiniBar
 	table.insert(ThemeListeners, { type = "text_lt", obj = MBLabel })
-
-	-- ミニバー：右側薄いサブテキスト
-	local MBSub = Instance.new("TextLabel")
-	MBSub.Size = UDim2.fromOffset(110, 28)
-	MBSub.AnchorPoint = Vector2.new(1, 0.5)
-	MBSub.Position = UDim2.new(1, -8, 0.5, 0)
-	MBSub.BackgroundTransparency = 1
-	MBSub.Text = "by HertaIX Lib"
-	MBSub.Font = Enum.Font.Code
-	MBSub.TextSize = 11
-	MBSub.TextColor3 = C_ACCENT_LT
-	MBSub.TextTransparency = 0.55
-	MBSub.TextXAlignment = Enum.TextXAlignment.Right
-	MBSub.ZIndex = 101
-	MBSub.Parent = MiniBar
-	table.insert(ThemeListeners, { type = "text_lt", obj = MBSub })
 
 	local MBAccent = Instance.new("Frame")
 	MBAccent.Size = UDim2.new(1, 0, 0, 2)

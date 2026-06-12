@@ -1401,7 +1401,7 @@ function HertaIX:CreateWindow(titleText)
 	ThemePanel.ZIndex = 50
 	ThemePanel.Visible = false
 	ThemePanel.ClipsDescendants = false
-	ThemePanel.Parent = Main
+	ThemePanel.Parent = ScreenGui
 	table.insert(ThemeListeners, { type = "bg", obj = ThemePanel })
 
 	local TPCorner = Instance.new("UICorner")
@@ -1474,8 +1474,17 @@ function HertaIX:CreateWindow(titleText)
 	local PanelOpen = false
 	ConfigBtn.MouseButton1Click:Connect(function()
 		PanelOpen = not PanelOpen
+		if PanelOpen then
+			-- ConfigBtn の画面座標を取得してパネルを右下に配置
+			local absPos  = Main.AbsolutePosition
+			local absSize = Main.AbsoluteSize
+			ThemePanel.Position = UDim2.fromOffset(
+				absPos.X + absSize.X - 160,
+				absPos.Y + absSize.Y + 4
+			)
+			UpdateThemeItems()
+		end
 		ThemePanel.Visible = PanelOpen
-		if PanelOpen then UpdateThemeItems() end
 	end)
 
 	return Window

@@ -594,7 +594,7 @@ function HertaIX:CreateWindow(titleText, theme)
 	-- タブバー
 	local TabBar = Instance.new("Frame")
 	TabBar.Name = "TabBar"
-	TabBar.Size = UDim2.new(1, -20, 0, 30)
+	TabBar.Size = UDim2.new(1, -20, 0, 45)
 	TabBar.Position = UDim2.new(0, 10, 0, 56)
 	TabBar.BackgroundTransparency = 1
 	TabBar.BorderSizePixel = 0
@@ -605,8 +605,8 @@ function HertaIX:CreateWindow(titleText, theme)
 	-- コンテンツ領域
 	local ContentArea = Instance.new("Frame")
 	ContentArea.Name = "ContentArea"
-	ContentArea.Size = UDim2.new(1, -20, 1, -100)
-	ContentArea.Position = UDim2.new(0, 10, 0, 92)
+	ContentArea.Size = UDim2.new(1, -20, 1, -115)
+	ContentArea.Position = UDim2.new(0, 10, 0, 107)
 	ContentArea.BackgroundTransparency = 1
 	ContentArea.BorderSizePixel = 0
 	ContentArea.ClipsDescendants = true
@@ -812,7 +812,9 @@ function HertaIX:CreateWindow(titleText, theme)
 			local active = (t == target)
 			t.Page.Visible = active
 			t.Underline.Visible = active
-			t.Button.TextColor3 = active and C_ACCENT_LT or C_DARK
+			if t.Status then
+				t.Status.Text = active and "Selected" or ""
+			end
 		end
 		Window._ActiveTab = target
 	end
@@ -822,8 +824,8 @@ function HertaIX:CreateWindow(titleText, theme)
 	-- ----------------------------------------------------------
 	function Window:CreateTab(name)
 
-		local TAB_W = 90
-		local TAB_H = 28
+		local TAB_W = 110
+		local TAB_H = 45
 
 		-- タブボタン：TextButton（透明・クリック受付け用）
 		local Btn = Instance.new("TextButton")
@@ -835,7 +837,7 @@ function HertaIX:CreateWindow(titleText, theme)
 		Btn.ZIndex = 10
 		Btn.Parent = self._TabBar
 
-		-- タブボタン：暗い半透明背景（MakeHertaFrameと同じデザイン・ UICornerなし）
+		-- タブボタン：暗い半透明背景
 		local BtnBg = Instance.new("Frame")
 		BtnBg.Size = UDim2.fromScale(1, 1)
 		BtnBg.BackgroundColor3 = C_BG
@@ -852,22 +854,36 @@ function HertaIX:CreateWindow(titleText, theme)
 		BtnStroke.Parent = BtnBg
 		table.insert(ThemeListeners, { type = "stroke", obj = BtnStroke })
 
-		MakeCorner(BtnBg, 0, 0)
-		MakeCorner(BtnBg, 1, 0)
-		MakeCorner(BtnBg, 0, 1)
-		MakeCorner(BtnBg, 1, 1)
+		-- L字コーナー（4隅）
+		MakeCorner(Btn, 0, 0)
+		MakeCorner(Btn, 1, 0)
+		MakeCorner(Btn, 0, 1)
+		MakeCorner(Btn, 1, 1)
 
-		-- タブボタン：テキストラベル（TextButtonのテキストと二重にならないよう分離）
-		local BtnLabel = Instance.new("TextLabel")
-		BtnLabel.Size = UDim2.fromScale(1, 1)
-		BtnLabel.BackgroundTransparency = 1
-		BtnLabel.Text = name
-		BtnLabel.Font = Enum.Font.Code
-		BtnLabel.TextSize = 16
-		BtnLabel.TextColor3 = C_DARK
-		BtnLabel.ZIndex = 11
-		BtnLabel.Parent = Btn
-		table.insert(ThemeListeners, { type = "text_dark", obj = BtnLabel })
+		-- タブタイトル（上段）
+		local BtnTitle = Instance.new("TextLabel")
+		BtnTitle.Size = UDim2.new(1, 0, 0, 22)
+		BtnTitle.BackgroundTransparency = 1
+		BtnTitle.Text = name
+		BtnTitle.Font = Enum.Font.Code
+		BtnTitle.TextSize = 18
+		BtnTitle.TextColor3 = C_ACCENT_LT
+		BtnTitle.ZIndex = 11
+		BtnTitle.Parent = Btn
+		table.insert(ThemeListeners, { type = "text_lt", obj = BtnTitle })
+
+		-- タブステータス（下段）
+		local BtnStatus = Instance.new("TextLabel")
+		BtnStatus.Size = UDim2.new(1, 0, 0, 15)
+		BtnStatus.Position = UDim2.new(0, 0, 0, 22)
+		BtnStatus.BackgroundTransparency = 1
+		BtnStatus.Text = ""
+		BtnStatus.Font = Enum.Font.Code
+		BtnStatus.TextSize = 12
+		BtnStatus.TextColor3 = C_ACCENT
+		BtnStatus.ZIndex = 11
+		BtnStatus.Parent = Btn
+		table.insert(ThemeListeners, { type = "text_accent", obj = BtnStatus })
 
 		local Underline = Instance.new("Frame")
 		Underline.Size = UDim2.new(1, 0, 0, 2)
@@ -906,6 +922,7 @@ function HertaIX:CreateWindow(titleText, theme)
 			Button    = Btn,
 			Page      = Page,
 			Underline = Underline,
+			Status    = BtnStatus,
 			_Order    = 0,
 		}
 

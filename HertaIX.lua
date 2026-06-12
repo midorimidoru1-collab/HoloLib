@@ -1264,15 +1264,11 @@ function HertaIX:CreateWindow(titleText, theme)
 
 				local function RefreshList()
 					local listH = Open and #options * 28 or 0
+					Container.Size = UDim2.new(1, 0, 0, 36 + listH + (Open and 2 or 0))
 					TweenService:Create(
 						ListFrame,
 						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
 						{ Size = UDim2.new(1, 0, 0, listH) }
-					):Play()
-					TweenService:Create(
-						Container,
-						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
-						{ Size = UDim2.new(1, 0, 0, 36 + listH + (Open and 2 or 0)) }
 					):Play()
 				end
 

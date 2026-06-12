@@ -331,6 +331,95 @@ function HertaIX:CreateWindow(titleText, theme)
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	ScreenGui.Parent = PlayerGui
 
+	-- ============================================================
+	--  ロード画面アニメーション
+	-- ============================================================
+	local LoadFrame = Instance.new("Frame")
+	LoadFrame.Size = UDim2.fromScale(1, 1)
+	LoadFrame.BackgroundColor3 = Color3.fromRGB(2, 8, 12)
+	LoadFrame.BackgroundTransparency = 0
+	LoadFrame.BorderSizePixel = 0
+	LoadFrame.ZIndex = 100
+	LoadFrame.Parent = ScreenGui
+
+	-- アイコン画像
+	local IconImg = Instance.new("ImageLabel")
+	IconImg.Size = UDim2.fromOffset(180, 180)
+	IconImg.AnchorPoint = Vector2.new(0.5, 0.5)
+	IconImg.Position = UDim2.fromScale(0.5, 0.5)
+	IconImg.BackgroundTransparency = 1
+	IconImg.Image = "https://raw.githubusercontent.com/midorimidoru1-collab/HertaIX/master/icon.png"
+	IconImg.ImageTransparency = 1
+	IconImg.ZIndex = 101
+	IconImg.Parent = LoadFrame
+
+	-- HertaIX テキスト（右外から出てくる）
+	local TitleLabel = Instance.new("TextLabel")
+	TitleLabel.Size = UDim2.fromOffset(260, 60)
+	TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
+	TitleLabel.Position = UDim2.new(1, 20, 0.5, 0)   -- 画面右外
+	TitleLabel.BackgroundTransparency = 1
+	TitleLabel.Text = "HertaIX"
+	TitleLabel.Font = Enum.Font.GothamBold
+	TitleLabel.TextSize = 48
+	TitleLabel.TextColor3 = C_ACCENT
+	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TitleLabel.TextTransparency = 1
+	TitleLabel.ZIndex = 101
+	TitleLabel.Parent = LoadFrame
+
+	task.spawn(function()
+		-- フェードイン：アイコン出現
+		local t1 = TweenService:Create(
+			IconImg,
+			TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ ImageTransparency = 0 }
+		)
+		t1:Play()
+		t1.Completed:Wait()
+		task.wait(0.1)
+
+		-- アイコンが左へスライド、同時にテキストが右から出現
+		local t2a = TweenService:Create(
+			IconImg,
+			TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{ Position = UDim2.new(0.5, -110, 0.5, 0) }
+		)
+		local t2b = TweenService:Create(
+			TitleLabel,
+			TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+			{
+				Position = UDim2.new(0.5, -70, 0.5, 0),
+				TextTransparency = 0
+			}
+		)
+		t2a:Play()
+		t2b:Play()
+		t2a.Completed:Wait()
+
+		task.wait(1)
+
+		-- フェードアウト：ロード画面を消す
+		local t3 = TweenService:Create(
+			LoadFrame,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ BackgroundTransparency = 1 }
+		)
+		local t3b = TweenService:Create(
+			IconImg,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ ImageTransparency = 1 }
+		)
+		local t3c = TweenService:Create(
+			TitleLabel,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ TextTransparency = 1 }
+		)
+		t3:Play() ; t3b:Play() ; t3c:Play()
+		t3.Completed:Wait()
+		LoadFrame:Destroy()
+	end)
+
 	local Main = Instance.new("Frame")
 	Main.Size = UDim2.fromOffset(600, 380)
 	Main.Position = UDim2.fromScale(0.5, 0.5)

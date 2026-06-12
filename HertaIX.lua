@@ -1181,95 +1181,109 @@ function HertaIX:CreateWindow(titleText, theme)
 			local Selected = nil
 			local Open     = false
 
-			local Container = Instance.new("Frame")
-			Container.Size = UDim2.new(1, 0, 0, 36)
-			Container.BackgroundTransparency = 1
-			Container.BorderSizePixel = 0
-			Container.ClipsDescendants = false
-			Container.LayoutOrder = NextOrder()
-			Container.ZIndex = 20
-			Container.Parent = tabEntry.Page
+				local Container = Instance.new("Frame")
+				Container.Size = UDim2.new(1, 0, 0, 36)
+				Container.BackgroundTransparency = 1
+				Container.BorderSizePixel = 0
+				Container.ClipsDescendants = false
+				Container.LayoutOrder = NextOrder()
+				Container.ZIndex = 20
+				Container.Parent = tabEntry.Page
 
-			local MainButton = Instance.new("TextButton")
-			MainButton.Size = UDim2.new(1, 0, 0, 36)
-			MainButton.BackgroundColor3 = C_BG
-			MainButton.BackgroundTransparency = 0.45
-			MainButton.BorderSizePixel = 0
-			MainButton.Text = ""
-			MainButton.ZIndex = 20
-			MainButton.Parent = Container
-			table.insert(ThemeListeners, { type = "bg", obj = MainButton })
+				local MainButton = Instance.new("TextButton")
+				MainButton.Size = UDim2.new(1, 0, 0, 36)
+				MainButton.BackgroundColor3 = C_BG
+				MainButton.BackgroundTransparency = 0.45
+				MainButton.BorderSizePixel = 0
+				MainButton.Text = ""
+				MainButton.ZIndex = 20
+				MainButton.Parent = Container
+				table.insert(ThemeListeners, { type = "bg", obj = MainButton })
 
-			local MBCorner2 = Instance.new("UICorner")
-			MBCorner2.CornerRadius = UDim.new(0, 4)
-			MBCorner2.Parent = MainButton
+				local MBCorner2 = Instance.new("UICorner")
+				MBCorner2.CornerRadius = UDim.new(0, 4)
+				MBCorner2.Parent = MainButton
 
-			local MBStroke2 = Instance.new("UIStroke")
-			MBStroke2.Color = C_ACCENT
-			MBStroke2.Thickness = 1
-			MBStroke2.Transparency = 0.5
-			MBStroke2.Parent = MainButton
-			table.insert(ThemeListeners, { type = "stroke", obj = MBStroke2 })
-
-			-- 4隅コーナー
-			MakeCorner(MainButton, 0, 0)
-			MakeCorner(MainButton, 1, 0)
-			MakeCorner(MainButton, 0, 1)
-			MakeCorner(MainButton, 1, 1)
-
-			local Header = Instance.new("TextLabel")
-			Header.Size = UDim2.new(1, -10, 1, 0)
-			Header.Position = UDim2.fromOffset(10, 0)
-			Header.BackgroundTransparency = 1
-			Header.Font = Enum.Font.Code
-			Header.TextSize = 16
-			Header.TextColor3 = C_ACCENT_LT
-			Header.TextXAlignment = Enum.TextXAlignment.Left
-			Header.Text = titleText2 .. "  ▼"
-			Header.ZIndex = 21
-			Header.Parent = MainButton
-			table.insert(ThemeListeners, { type = "text_lt", obj = Header })
-
-			local ListFrame = Instance.new("Frame")
-			ListFrame.Size = UDim2.new(1, 0, 0, 0)
-			ListFrame.Position = UDim2.new(0, 0, 1, 2)
-			ListFrame.BackgroundColor3 = C_BG
-			ListFrame.BackgroundTransparency = 0.3
-			ListFrame.BorderSizePixel = 0
-			ListFrame.ClipsDescendants = true
-			ListFrame.ZIndex = 22
-			ListFrame.Parent = Container
-			table.insert(ThemeListeners, { type = "bg", obj = ListFrame })
-
-			local LFCorner = Instance.new("UICorner")
-			LFCorner.CornerRadius = UDim.new(0, 4)
-			LFCorner.Parent = ListFrame
-
-			local LFStroke = Instance.new("UIStroke")
-			LFStroke.Color = C_ACCENT
-			LFStroke.Thickness = 1
-			LFStroke.Transparency = 0.5
-			LFStroke.Parent = ListFrame
-			table.insert(ThemeListeners, { type = "stroke", obj = LFStroke })
-
-			local Layout = Instance.new("UIListLayout")
-			Layout.SortOrder = Enum.SortOrder.LayoutOrder
-			Layout.Parent = ListFrame
-
-			local function UpdateHeader()
-				Header.Text = (Selected and tostring(Selected) or titleText2) .. "  ▼"
-				Header.TextColor3 = Selected and C_ACCENT or C_ACCENT_LT
+				local MBStroke2 = Instance.new("UIStroke")
 				MBStroke2.Color = C_ACCENT
-			end
+				MBStroke2.Thickness = 1
+				MBStroke2.Transparency = 0.5
+				MBStroke2.Parent = MainButton
+				table.insert(ThemeListeners, { type = "stroke", obj = MBStroke2 })
+
+				-- 4隅コーナー
+				MakeCorner(MainButton, 0, 0)
+				MakeCorner(MainButton, 1, 0)
+				MakeCorner(MainButton, 0, 1)
+				MakeCorner(MainButton, 1, 1)
+
+				local Header = Instance.new("TextLabel")
+				Header.Size = UDim2.new(1, -10, 1, 0)
+				Header.Position = UDim2.fromOffset(10, 0)
+				Header.BackgroundTransparency = 1
+				Header.Font = Enum.Font.Code
+				Header.TextSize = 16
+				Header.TextColor3 = C_ACCENT_LT
+				Header.TextXAlignment = Enum.TextXAlignment.Left
+				Header.Text = titleText2 .. "  ▼"
+				Header.ZIndex = 21
+				Header.Parent = MainButton
+				table.insert(ThemeListeners, { type = "text_lt", obj = Header })
+
+				-- ListFrameはScreenGuiの子として配置し、他要素を押し下げず重ねて表示
+				local ListFrame = Instance.new("Frame")
+				ListFrame.Size = UDim2.fromOffset(0, 0)
+				ListFrame.BackgroundColor3 = C_BG
+				ListFrame.BackgroundTransparency = 0.3
+				ListFrame.BorderSizePixel = 0
+				ListFrame.ClipsDescendants = true
+				ListFrame.ZIndex = 50
+				ListFrame.Visible = false
+				ListFrame.Parent = ScreenGui
+				table.insert(ThemeListeners, { type = "bg", obj = ListFrame })
+
+				local LFCorner = Instance.new("UICorner")
+				LFCorner.CornerRadius = UDim.new(0, 4)
+				LFCorner.Parent = ListFrame
+
+				local LFStroke = Instance.new("UIStroke")
+				LFStroke.Color = C_ACCENT
+				LFStroke.Thickness = 1
+				LFStroke.Transparency = 0.5
+				LFStroke.Parent = ListFrame
+				table.insert(ThemeListeners, { type = "stroke", obj = LFStroke })
+
+				local Layout = Instance.new("UIListLayout")
+				Layout.SortOrder = Enum.SortOrder.LayoutOrder
+				Layout.Parent = ListFrame
+
+				local function UpdateHeader()
+					Header.Text = (Selected and tostring(Selected) or titleText2) .. "  ▼"
+					Header.TextColor3 = Selected and C_ACCENT or C_ACCENT_LT
+					MBStroke2.Color = C_ACCENT
+				end
 
 				local function RefreshList()
 					local listH = Open and #options * 28 or 0
-					Container.Size = UDim2.new(1, 0, 0, 36 + listH + (Open and 2 or 0))
+					if Open then
+						-- MainButtonのAbsolutePositionを基にリストをボタン直下に配置
+						local abs = MainButton.AbsolutePosition
+						local absSize = MainButton.AbsoluteSize
+						ListFrame.Position = UDim2.fromOffset(abs.X, abs.Y + absSize.Y + 2)
+						ListFrame.Size = UDim2.fromOffset(absSize.X, 0)
+						ListFrame.Visible = true
+					end
 					TweenService:Create(
 						ListFrame,
 						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
-						{ Size = UDim2.new(1, 0, 0, listH) }
+						{ Size = UDim2.fromOffset(
+							MainButton.AbsoluteSize.X,
+							listH
+						)}
 					):Play()
+					if not Open then
+						task.delay(0.19, function() ListFrame.Visible = false end)
+					end
 				end
 
 			local function BuildOptions()

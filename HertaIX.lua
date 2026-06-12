@@ -318,7 +318,12 @@ HertaIX.__index = HertaIX
 -- ------------------------------------------------------------
 --  CreateWindow(titleText)
 -- ------------------------------------------------------------
-function HertaIX:CreateWindow(titleText)
+function HertaIX:CreateWindow(titleText, theme)
+
+	-- テーマ引数が指定されていれば起動時に適用
+	if theme then
+		ApplyTheme(theme)
+	end
 
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "HertaIXGui"
@@ -464,19 +469,6 @@ function HertaIX:CreateWindow(titleText)
 	Cursor.ZIndex = 10
 	Cursor.Parent = Main
 	table.insert(ThemeListeners, { type = "text_main", obj = Cursor })
-
-	-- ヘッダー：設定ボタン（⚙ テーマドロップダウン）
-	local ConfigBtn = Instance.new("TextButton")
-	ConfigBtn.Size = UDim2.fromOffset(35, 35)
-	ConfigBtn.Position = UDim2.new(1, -125, 0, 10)
-	ConfigBtn.BackgroundTransparency = 1
-	ConfigBtn.Text = "⚙"
-	ConfigBtn.Font = Enum.Font.Code
-	ConfigBtn.TextSize = 22
-	ConfigBtn.TextColor3 = C_ACCENT_LT
-	ConfigBtn.ZIndex = 10
-	ConfigBtn.Parent = Main
-	table.insert(ThemeListeners, { type = "text_lt", obj = ConfigBtn })
 
 	-- ヘッダー：最小化ボタン
 	local Minimize = Instance.new("TextButton")
@@ -1366,126 +1358,6 @@ function HertaIX:CreateWindow(titleText)
 			if Notification then Notification:Destroy() end
 		end)
 	end
-
-	-- ----------------------------------------------------------
-	--  ⚙ テーマドロップダウンパネル（設定ボタンから開閉）
-	-- ----------------------------------------------------------
-	local ITEM_H    = 30
-	local PANEL_PAD = 4
-	local ThemeOrder = {
-		"near_future", "gameboy", "rainbow_B", "rainbow_W",
-		"monotone", "undertale", "leaf", "herta", "king"
-	}
-	local ThemeLabels = {
-		near_future = "NEAR FUTURE",
-		gameboy     = "GAMEBOY",
-		rainbow_B   = "RAINBOW B",
-		rainbow_W   = "RAINBOW W",
-		monotone    = "MONOTONE",
-		undertale   = "UNDERTALE",
-		leaf        = "LEAF",
-		herta       = "HERTA",
-		king        = "KING",
-	}
-	local PANEL_H = #ThemeOrder * ITEM_H + PANEL_PAD * 2
-
-	-- パネル本体（Main の右上に重ねる）
-	local ThemePanel = Instance.new("Frame")
-	ThemePanel.Name = "ThemePanel"
-	ThemePanel.Size = UDim2.fromOffset(160, PANEL_H)
-	ThemePanel.AnchorPoint = Vector2.new(1, 0)
-	ThemePanel.Position = UDim2.new(1, 0, 1, 4)
-	ThemePanel.BackgroundColor3 = C_BG
-	ThemePanel.BackgroundTransparency = 0.15
-	ThemePanel.BorderSizePixel = 0
-	ThemePanel.ZIndex = 50
-	ThemePanel.Visible = false
-	ThemePanel.ClipsDescendants = false
-	ThemePanel.Parent = ScreenGui
-	table.insert(ThemeListeners, { type = "bg", obj = ThemePanel })
-
-	local TPCorner = Instance.new("UICorner")
-	TPCorner.CornerRadius = UDim.new(0, 6)
-	TPCorner.Parent = ThemePanel
-
-	local TPStroke = Instance.new("UIStroke")
-	TPStroke.Color = C_ACCENT
-	TPStroke.Transparency = 0.4
-	TPStroke.Parent = ThemePanel
-	table.insert(ThemeListeners, { type = "stroke", obj = TPStroke })
-
-	local CurrentTheme = "near_future"
-	local ThemeItemBtns = {}
-
-	local function UpdateThemeItems()
-		for name, btn in pairs(ThemeItemBtns) do
-			if name == CurrentTheme then
-				btn.TextColor3 = C_ACCENT
-				btn.BackgroundTransparency = 0.6
-			else
-				btn.TextColor3 = C_TEXT
-				btn.BackgroundTransparency = 1
-			end
-		end
-	end
-
-	for i, name in ipairs(ThemeOrder) do
-		local Item = Instance.new("TextButton")
-		Item.Size = UDim2.new(1, -PANEL_PAD*2, 0, ITEM_H)
-		Item.Position = UDim2.fromOffset(PANEL_PAD, PANEL_PAD + (i-1)*ITEM_H)
-		Item.BackgroundColor3 = C_ACCENT
-		Item.BackgroundTransparency = 1
-		Item.BorderSizePixel = 0
-		Item.Font = Enum.Font.Code
-		Item.TextSize = 15
-		Item.Text = ThemeLabels[name]
-		Item.TextColor3 = C_TEXT
-		Item.TextXAlignment = Enum.TextXAlignment.Left
-		Item.ZIndex = 51
-		Item.Parent = ThemePanel
-		table.insert(ThemeListeners, { type = "text_main", obj = Item })
-
-		if i < #ThemeOrder then
-			local Divider = Instance.new("Frame")
-			Divider.Size = UDim2.new(1, -PANEL_PAD*2, 0, 1)
-			Divider.Position = UDim2.fromOffset(PANEL_PAD, PANEL_PAD + i*ITEM_H - 1)
-			Divider.BackgroundColor3 = C_ACCENT
-			Divider.BackgroundTransparency = 0.7
-			Divider.BorderSizePixel = 0
-			Divider.ZIndex = 51
-			Divider.Parent = ThemePanel
-			table.insert(ThemeListeners, { type = "accent", obj = Divider })
-		end
-
-		ThemeItemBtns[name] = Item
-
-		Item.MouseButton1Click:Connect(function()
-			CurrentTheme = name
-			ApplyTheme(name)
-			UpdateThemeItems()
-			ThemePanel.Visible = false
-			PanelOpen = false
-		end)
-	end
-
-	UpdateThemeItems()
-
-	-- ⚙ ボタン：クリックでパネル開閉
-	local PanelOpen = false
-	ConfigBtn.MouseButton1Click:Connect(function()
-		PanelOpen = not PanelOpen
-		if PanelOpen then
-			-- ConfigBtn の画面座標を取得してパネルを右下に配置
-			local absPos  = Main.AbsolutePosition
-			local absSize = Main.AbsoluteSize
-			ThemePanel.Position = UDim2.fromOffset(
-				absPos.X + absSize.X - 160,
-				absPos.Y + absSize.Y + 4
-			)
-			UpdateThemeItems()
-		end
-		ThemePanel.Visible = PanelOpen
-	end)
 
 	return Window
 end

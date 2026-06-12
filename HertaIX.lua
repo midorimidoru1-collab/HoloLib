@@ -899,10 +899,14 @@ function HertaIX:CreateWindow(titleText, theme)
 		Page.Size = UDim2.fromScale(1, 1)
 		Page.BackgroundTransparency = 1
 		Page.BorderSizePixel = 0
-		Page.ScrollBarThickness = 3
+		Page.ScrollBarThickness = 4
 		Page.ScrollBarImageColor3 = C_ACCENT
+		Page.ScrollBarImageTransparency = 0.3
 		Page.CanvasSize = UDim2.fromOffset(0, 0)
 		Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		Page.ScrollingEnabled = true
+		Page.ScrollingDirection = Enum.ScrollingDirection.Y
+		Page.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
 		Page.Visible = false
 		Page.Parent = self._ContentArea
 
@@ -1258,13 +1262,19 @@ function HertaIX:CreateWindow(titleText, theme)
 				MBStroke2.Color = C_ACCENT
 			end
 
-			local function RefreshList()
-				TweenService:Create(
-					ListFrame,
-					TweenInfo.new(0.18, Enum.EasingStyle.Quad),
-					{ Size = UDim2.new(1, 0, 0, Open and #options * 28 or 0) }
-				):Play()
-			end
+				local function RefreshList()
+					local listH = Open and #options * 28 or 0
+					TweenService:Create(
+						ListFrame,
+						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+						{ Size = UDim2.new(1, 0, 0, listH) }
+					):Play()
+					TweenService:Create(
+						Container,
+						TweenInfo.new(0.18, Enum.EasingStyle.Quad),
+						{ Size = UDim2.new(1, 0, 0, 36 + listH + (Open and 2 or 0)) }
+					):Play()
+				end
 
 			local function BuildOptions()
 				for _, child in ipairs(ListFrame:GetChildren()) do

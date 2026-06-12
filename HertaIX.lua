@@ -648,6 +648,9 @@ function HertaIX:CreateWindow(titleText, theme)
 			local centerX = absPos.X + absSize.X / 2
 			Main.AnchorPoint = Vector2.new(0.5, 0)
 			Main.Position = UDim2.new(0, centerX, 0, topY)
+			-- コンテンツを即座に隠す（ClipsDescendants=falseでもはみ出さないように）
+			ContentArea.Visible = false
+			TabBar.Visible = false
 			TweenService:Create(
 				Main,
 				TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -659,6 +662,11 @@ function HertaIX:CreateWindow(titleText, theme)
 				TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 				{ Size = FullSize }
 			):Play()
+			-- 展開完了後にコンテンツを再表示
+			task.delay(0.21, function()
+				ContentArea.Visible = true
+				TabBar.Visible = true
+			end)
 		end
 	end)
 

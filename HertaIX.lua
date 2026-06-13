@@ -145,15 +145,14 @@ local C_CYAN_TEXT  = C_TEXT
 
 -- テーマ変更時に更新が必要なオブジェクトを登録するテーブル
 local ThemeListeners = {}  -- { type="stroke"|"bg"|"corner"|"text"|"mainbg", obj=Instance, ... }
-local RainbowConns   = {}  -- rainbow アニメ用接続
+local _RainbowActive = false  -- rainbow スレッド制御フラグ
 
 local function RainbowColor(hue)
 	return Color3.fromHSV(hue % 1, 1, 1)
 end
 
 local function ClearRainbow()
-	for _, c in ipairs(RainbowConns) do c:Disconnect() end
-	RainbowConns = {}
+	_RainbowActive = false
 end
 
 local function ApplyTheme(name)
@@ -223,33 +222,35 @@ local function ApplyTheme(name)
 		end
 	end
 
-	-- rainbow アニメ
+	-- rainbow アニメ（aimlock_test.txt 方式: spawn + tick()*0.2%1 + task.wait(0.03)）
 	if T.rainbow then
-		local conn = RunService.RenderStepped:Connect(function()
-			local hue = (tick() * 0.2) % 1
-			local col = RainbowColor(hue)
-			for _, entry in ipairs(ThemeListeners) do
-				local ok2, obj2 = pcall(function() return entry.obj end)
-				if not ok2 or not obj2 or not obj2.Parent then continue end
-				if entry.type == "stroke"
-				or entry.type == "corner_h"
-				or entry.type == "corner_v"
-				or entry.type == "fill"
-				or entry.type == "underline"
-				or entry.type == "headerline"
-				or entry.type == "mainbg" then
-					obj2.BackgroundColor3 = col
-					if entry.type == "mainbg" then
-						obj2.BackgroundTransparency = T.mainAlpha
+		_RainbowActive = true
+		local mainAlpha = T.mainAlpha
+		spawn(function()
+			while _RainbowActive do
+				local hue = (tick() * 0.2) % 1
+				local col = RainbowColor(hue)
+				for _, entry in ipairs(ThemeListeners) do
+					local ok2, obj2 = pcall(function() return entry.obj end)
+					if not ok2 or not obj2 or not obj2.Parent then continue end
+					if entry.type == "stroke" then
+						obj2.Color = col
+					elseif entry.type == "corner_h"
+						or entry.type == "corner_v"
+						or entry.type == "fill"
+						or entry.type == "underline"
+						or entry.type == "headerline" then
+						obj2.BackgroundColor3 = col
+					elseif entry.type == "mainbg" then
+						obj2.BackgroundColor3 = col
+						obj2.BackgroundTransparency = mainAlpha
+					elseif entry.type == "text_accent" then
+						obj2.TextColor3 = col
 					end
-				elseif entry.type == "stroke" then
-					obj2.Color = col
-				elseif entry.type == "text_accent" then
-					obj2.TextColor3 = col
 				end
+				task.wait(0.03)
 			end
 		end)
-		table.insert(RainbowConns, conn)
 	end
 end
 
